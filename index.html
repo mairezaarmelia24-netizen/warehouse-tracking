@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
+  <title>Warehouse Activity Tracking</title>
+
+  <!-- QR SCANNER -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 15px;
+    }
+
+    .container {
+      max-width: 420px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    h2 {
+      text-align: center;
+      color: #17365d;
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 15px;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .info {
+      background: #eef7ee;
+      padding: 13px;
+      border-radius: 8px;
+      margin-top: 15px;
+      line-height: 1.7;
+    }
+
+    .activity {
+      background: #eef5ff;
+      padding: 13px;
+      border-radius: 8px;
+      margin-top: 10px;
+      line-height: 1.7;
+    }
+
+    .scanButton {
+      width: 100%;
+      padding: 15px;
+      margin-top: 18px;
+      background: #17365d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 17px;
+      font-weight: bold;
+    }
+
+    .stopButton {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      background: #ddd;
+      color: #333;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      display: none;
+    }
+
+    #reader {
+      width: 100%;
+      margin-top: 15px;
+    }
+
+    .status {
+      padding: 13px;
+      margin-top: 15px;
+      background: #f1f3f5;
+      border-radius: 8px;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .success {
+      background: #e8f5e9;
+    }
+
+    .warning {
+      background: #fff3cd;
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+  <h2>🏭 Warehouse Tracking</h2>
+
+
+  <!-- OPERATOR -->
+
+  <label>Nama Operator</label>
+
+  <input
+    id="operator"
+    type="text"
+    placeholder="Masukkan nama operator">
+
+
+  <!-- CUSTOMER -->
+
+  <label>Customer ID</label>
+
+  <input
+    id="customerID"
+    type="text"
+    placeholder="Masukkan Customer ID">
+
+
+  <!-- TRANSACTION -->
+
+  <div class="info">
+
+    <b>Transaction ID</b><br>
+
+    <span id="transaction">
+      Belum scan
+    </span>
+
+  </div>
+
+
+  <!-- ACTIVITY -->
+
+  <div class="activity">
+
+    <b>Department:</b>
+    <span id="department">-</span>
+
+    <br>
+
+    <b>Activity:</b>
+    <span id="activity">-</span>
+
+  </div>
+
+
+  <!-- QUANTITY -->
+
+  <label>Quantity</label>
+
+  <input
+    id="quantity"
+    type="number"
+    placeholder="Isi setelah pekerjaan selesai">
+
+
+  <!-- SCAN -->
+
+  <button
+    id="scanButton"
+    class="scanButton"
+    onclick="startScanner()">
+
+    📷 SCAN QR
+
+  </button>
+
+
+  <button
+    id="stopButton"
+    class="stopButton"
+    onclick="stopScanner()">
+
+    Tutup Kamera
+
+  </button>
+
+
+  <!-- CAMERA -->
+
+  <div id="reader"></div>
+
+
+  <!-- STATUS -->
+
+  <div
+    id="status"
+    class="status">
+
+    Isi Nama Operator dan Customer ID,
+    lalu tekan SCAN QR.
+
+  </div>
+
+</div>
+
+
+<script>
+
+
+// =====================================================
+// URL GOOGLE APPS SCRIPT
+// =====================================================
+
+const APPS_SCRIPT_URL =
+"https://script.google.com/macros/s/AKfycbyp9hUopC-ZLxGG2KiStLBQ8oDnNC-sKqOp1YdYZpkx4mPm2SpEXkckex5TI69uJIjXgg/exec";
+
+
+// =====================================================
+// VARIABLES
+// =====================================================
+
+let scanner = null;
+
+let scannerRunning = false;
+
+let currentTransaction = "";
+
+let currentDepartment = "";
+
+let currentActivity = "";
+
+
+// =====================================================
+// START SCANNER
+// =====================================================
+
+function startScanner() {
+
+  const operator =
+    document.getElementById("operator")
+      .value.trim();
+
+  const customerID =
+    document.getElementById("customerID")
+      .value.trim();
+
+
+  // CHECK OPERATOR
+
+  if (!operator) {
+
+    alert("Isi Nama Operator terlebih dahulu.");
+
+    return;
+  }
+
+
+  // CHECK CUSTOMER
+
+  if (!customerID) {
+
+    alert("Isi Customer ID terlebih dahulu.");
+
+    return;
+  }
+
+
+  if (scannerRunning) return;
+
+
+  scanner =
+    new Html5Qrcode("reader");
+
+
+  document.getElementById("status")
+    .innerHTML =
+    "📷 Membuka kamera...";
+
+
+  scanner.start(
+
+    {
+      facingMode: "environment"
+    },
+
+    {
+      fps: 10,
+
+      qrbox: {
+        width: 250,
+        height: 250
+      }
+
+    },
+
+    function(decodedText) {
+
+      qrSuccess(decodedText);
+
+    },
+
+    function(errorMessage) {
+
+      // Jangan tampilkan error
+      // setiap frame kamera
+
+    }
+
+  )
+
+  .then(function() {
+
+    scannerRunning = true;
+
+    document.getElementById("scanButton")
+      .style.display = "none";
+
+    document.getElementById("stopButton")
+      .style.display = "block";
+
+    document.getElementById("status")
+      .innerHTML =
+      "📷 <b>Kamera aktif</b><br>" +
+      "Arahkan kamera ke QR.";
+
+  })
+
+  .catch(function(error) {
+
+    console.log(error);
+
+    scannerRunning = false;
+
+    document.getElementById("status")
+      .className =
+      "status warning";
+
+    document.getElementById("status")
+      .innerHTML =
+      "❌ Kamera tidak dapat dibuka.<br>" +
+      "Pastikan website dibuka melalui HTTPS.";
+
+  });
+
+}
+
+
+// =====================================================
+// QR BERHASIL DIBACA
+// =====================================================
+
+function qrSuccess(qrData) {
+
+  stopScanner();
+
+
+  const parts =
+    qrData.split("|");
+
+
+  // FORMAT QR HARUS:
+
+  // INB-001|INBOUND|Unloading
+
+
+  if (parts.length < 3) {
+
+    document.getElementById("status")
+      .className =
+      "status warning";
+
+    document.getElementById("status")
+      .innerHTML =
+      "❌ Format QR tidak sesuai.";
+
+    return;
+  }
+
+
+  currentTransaction =
+    parts[0].trim();
+
+  currentDepartment =
+    parts[1].trim();
+
+  currentActivity =
+    parts[2].trim();
+
+
+  // TAMPILKAN HASIL SCAN
+
+  document.getElementById("transaction")
+    .innerText =
+    currentTransaction;
+
+  document.getElementById("department")
+    .innerText =
+    currentDepartment;
+
+  document.getElementById("activity")
+    .innerText =
+    currentActivity;
+
+
+  // DATA INPUT
+
+  const operator =
+    document.getElementById("operator")
+      .value.trim();
+
+  const customerID =
+    document.getElementById("customerID")
+      .value.trim();
+
+  const quantity =
+    document.getElementById("quantity")
+      .value;
+
+
+  document.getElementById("status")
+    .className =
+    "status";
+
+  document.getElementById("status")
+    .innerHTML =
+    "⏳ Memproses scan...";
+
+
+  // ===================================================
+  // KIRIM KE GOOGLE APPS SCRIPT
+  // ===================================================
+
+  sendToGoogleSheet({
+
+    operator:
+      operator,
+
+    customerID:
+      customerID,
+
+    transactionID:
+      currentTransaction,
+
+    department:
+      currentDepartment,
+
+    activity:
+      currentActivity,
+
+    quantity:
+      quantity
+
+  });
+
+}
+
+
+// =====================================================
+// KIRIM DATA KE APPS SCRIPT
+// =====================================================
+
+function sendToGoogleSheet(data) {
+
+  const callbackName =
+    "callback_" +
+    Date.now();
+
+
+  window[callbackName] =
+    function(result) {
+
+      // Hapus callback
+
+      delete window[callbackName];
+
+
+      const script =
+        document.getElementById(callbackName);
+
+      if (script) {
+        script.remove();
+      }
+
+
+      // ================================================
+      // START
+      // ================================================
+
+      if (
+        result.success &&
+        result.type === "START"
+      ) {
+
+        document.getElementById("status")
+          .className =
+          "status success";
+
+        document.getElementById("status")
+          .innerHTML =
+          "🟢 <b>START BERHASIL</b><br>" +
+          currentActivity +
+          "<br><br>" +
+          "Silakan bekerja.";
+
+        return;
+      }
+
+
+      // ================================================
+      // FINISH
+      // ================================================
+
+      if (
+        result.success &&
+        result.type === "FINISH"
+      ) {
+
+        document.getElementById("status")
+          .className =
+          "status success";
+
+        document.getElementById("status")
+          .innerHTML =
+          "✅ <b>SELESAI</b><br>" +
+          currentActivity +
+          "<br>" +
+          "Duration: " +
+          result.duration +
+          " menit";
+
+        return;
+      }
+
+
+      // ================================================
+      // NEED QUANTITY
+      // ================================================
+
+      if (
+        result.type === "NEED_QUANTITY"
+      ) {
+
+        document.getElementById("status")
+          .className =
+          "status warning";
+
+        document.getElementById("status")
+          .innerHTML =
+          "⚠️ Isi Quantity terlebih dahulu.";
+
+        return;
+      }
+
+
+      // ================================================
+      // ERROR
+      // ================================================
+
+      document.getElementById("status")
+        .className =
+        "status warning";
+
+      document.getElementById("status")
+        .innerHTML =
+        "❌ " +
+        (result.message ||
+        "Data gagal diproses.");
+
+    };
+
+
+  // Buat URL API
+
+  const params = new URLSearchParams({
+
+    api:
+      "processScan",
+
+    callback:
+      callbackName,
+
+    operator:
+      data.operator,
+
+    customerID:
+      data.customerID,
+
+    transactionID:
+      data.transactionID,
+
+    department:
+      data.department,
+
+    activity:
+      data.activity,
+
+    quantity:
+      data.quantity
+
+  });
+
+
+  // Buat script JSONP
+
+  const script =
+    document.createElement("script");
+
+
+  script.id =
+    callbackName;
+
+  script.src =
+    APPS_SCRIPT_URL +
+    "?" +
+    params.toString();
+
+
+  document.body.appendChild(script);
+
+}
+
+
+// =====================================================
+// STOP CAMERA
+// =====================================================
+
+function stopScanner() {
+
+  if (
+    scanner &&
+    scannerRunning
+  ) {
+
+    scanner.stop()
+
+      .then(function() {
+
+        scanner.clear();
+
+        scannerRunning = false;
+
+        document.getElementById("scanButton")
+          .style.display = "block";
+
+        document.getElementById("stopButton")
+          .style.display = "none";
+
+      })
+
+      .catch(function() {
+
+        scannerRunning = false;
+
+        document.getElementById("scanButton")
+          .style.display = "block";
+
+        document.getElementById("stopButton")
+          .style.display = "none";
+
+      });
+
+  }
+
+}
+
+</script>
+
+</body>
+
+</html>
