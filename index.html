@@ -35,12 +35,13 @@ h2 {
   text-align: center;
   color: #17365d;
   margin-top: 0;
+  margin-bottom: 20px;
 }
 
 label {
   display: block;
   font-weight: bold;
-  margin-top: 15px;
+  margin-top: 14px;
   margin-bottom: 6px;
 }
 
@@ -232,7 +233,7 @@ END
 <br>
 
 <span id="transaction">
-Akan dibuat otomatis
+Akan dibuat saat START
 </span>
 
 </div>
@@ -243,18 +244,12 @@ Akan dibuat otomatis
 <div class="activity">
 
 <b>Activity:</b>
-
-<span id="activity">
--
-</span>
+<span id="activity">-</span>
 
 <br>
 
 <b>Action:</b>
-
-<span id="action">
--
-</span>
+<span id="action">-</span>
 
 </div>
 
@@ -266,10 +261,11 @@ Akan dibuat otomatis
 <input
   id="quantity"
   type="number"
+  min="0"
   placeholder="Isi Quantity saat END">
 
 
-<!-- ================= SCAN BUTTON ================= -->
+<!-- ================= SCAN ================= -->
 
 <button
   id="scanButton"
@@ -333,8 +329,6 @@ let currentActivity = "";
 
 let currentAction = "";
 
-let currentTransaction = "";
-
 
 // =====================================================
 // START SCANNER
@@ -342,251 +336,232 @@ let currentTransaction = "";
 
 function startScanner() {
 
+  const operator =
+    document.getElementById("operator")
+      .value
+      .trim();
 
-const operator =
-document.getElementById("operator")
-.value
-.trim();
+  const customerID =
+    document.getElementById("customerID")
+      .value;
 
+  const activity =
+    document.getElementById("activitySelect")
+      .value;
 
-const customerID =
-document.getElementById("customerID")
-.value;
+  const action =
+    document.getElementById("actionSelect")
+      .value;
 
 
-const activity =
-document.getElementById("activitySelect")
-.value;
+  // ================================================
+  // VALIDASI OPERATOR
+  // ================================================
 
+  if (!operator) {
 
-const action =
-document.getElementById("actionSelect")
-.value;
+    alert(
+      "Isi Nama Operator terlebih dahulu."
+    );
 
+    return;
 
-// ===================================================
-// VALIDASI OPERATOR
-// ===================================================
+  }
 
-if (!operator) {
 
-alert(
-"Isi Nama Operator terlebih dahulu."
-);
+  // ================================================
+  // VALIDASI CUSTOMER
+  // ================================================
 
-return;
+  if (!customerID) {
 
-}
+    alert(
+      "Pilih Customer ID terlebih dahulu."
+    );
 
+    return;
 
-// ===================================================
-// VALIDASI CUSTOMER
-// ===================================================
+  }
 
-if (!customerID) {
 
-alert(
-"Pilih Customer ID terlebih dahulu."
-);
+  // ================================================
+  // VALIDASI ACTIVITY
+  // ================================================
 
-return;
+  if (!activity) {
 
-}
+    alert(
+      "Pilih Activity terlebih dahulu."
+    );
 
+    return;
 
-// ===================================================
-// VALIDASI ACTIVITY
-// ===================================================
+  }
 
-if (!activity) {
 
-alert(
-"Pilih Activity terlebih dahulu."
-);
+  // ================================================
+  // VALIDASI ACTION
+  // ================================================
 
-return;
+  if (!action) {
 
-}
+    alert(
+      "Pilih Action START atau END terlebih dahulu."
+    );
 
+    return;
 
-// ===================================================
-// VALIDASI ACTION
-// ===================================================
+  }
 
-if (!action) {
 
-alert(
-"Pilih Action START atau END terlebih dahulu."
-);
+  // ================================================
+  // QUANTITY HANYA WAJIB SAAT END
+  // ================================================
 
-return;
+  if (action === "END") {
 
-}
+    const quantity =
+      document.getElementById("quantity")
+        .value
+        .trim();
 
+    if (quantity === "") {
 
-// ===================================================
-// VALIDASI QUANTITY UNTUK END
-// ===================================================
+      alert(
+        "Isi Quantity terlebih dahulu."
+      );
 
-if (
-action === "END"
-) {
+      return;
 
-const quantity =
-document.getElementById("quantity")
-.value;
+    }
 
-if (!quantity) {
+  }
 
-alert(
-"Isi Quantity terlebih dahulu."
-);
 
-return;
+  if (scannerRunning) {
 
-}
+    return;
 
-}
+  }
 
 
-// ===================================================
-// CEK SCANNER
-// ===================================================
+  // ================================================
+  // SIMPAN PILIHAN
+  // ================================================
 
-if (scannerRunning) {
+  currentActivity =
+    activity;
 
-return;
+  currentAction =
+    action;
 
-}
 
+  // ================================================
+  // TAMPILKAN
+  // ================================================
 
-// ===================================================
-// SIMPAN DATA
-// ===================================================
+  document.getElementById("activity")
+    .innerText =
+    currentActivity;
 
-currentActivity =
-activity;
+  document.getElementById("action")
+    .innerText =
+    currentAction;
 
-currentAction =
-action;
 
+  // ================================================
+  // STATUS
+  // ================================================
 
-// ===================================================
-// TAMPILKAN DATA
-// ===================================================
+  document.getElementById("status")
+    .className =
+    "status";
 
-document.getElementById("activity")
-.innerText =
-currentActivity;
+  document.getElementById("status")
+    .innerHTML =
+    "📷 Membuka kamera...";
 
 
-document.getElementById("action")
-.innerText =
-currentAction;
+  // ================================================
+  // BUAT SCANNER
+  // ================================================
 
+  scanner =
+    new Html5Qrcode("reader");
 
-// ===================================================
-// STATUS
-// ===================================================
 
-document.getElementById("status")
-.className =
-"status";
+  // ================================================
+  // BUKA KAMERA
+  // ================================================
 
+  scanner.start(
 
-document.getElementById("status")
-.innerHTML =
-"📷 Membuka kamera...";
+    {
+      facingMode: "environment"
+    },
 
+    {
+      fps: 10,
 
-// ===================================================
-// BUAT SCANNER
-// ===================================================
+      qrbox: {
+        width: 250,
+        height: 250
+      }
 
-scanner =
-new Html5Qrcode("reader");
+    },
 
+    function(decodedText) {
 
-// ===================================================
-// START CAMERA
-// ===================================================
+      qrSuccess(decodedText);
 
-scanner.start(
+    },
 
-{
-facingMode: "environment"
-},
+    function(errorMessage) {
 
-{
-fps: 10,
+      // Abaikan error setiap frame
 
-qrbox: {
-width: 250,
-height: 250
-}
+    }
 
-},
+  )
 
-function(decodedText) {
+  .then(function() {
 
-qrSuccess(decodedText);
+    scannerRunning =
+      true;
 
-},
+    document.getElementById("scanButton")
+      .style.display =
+      "none";
 
-function(errorMessage) {
+    document.getElementById("stopButton")
+      .style.display =
+      "block";
 
-// Abaikan error frame kamera
+    document.getElementById("status")
+      .innerHTML =
+      "📷 <b>Kamera aktif</b><br>" +
+      "Arahkan kamera ke QR " +
+      currentActivity + ".";
 
-}
+  })
 
-)
+  .catch(function(error) {
 
-.then(function() {
+    console.log(error);
 
+    scannerRunning =
+      false;
 
-scannerRunning =
-true;
+    document.getElementById("status")
+      .className =
+      "status warning";
 
+    document.getElementById("status")
+      .innerHTML =
+      "❌ Kamera tidak dapat dibuka.<br>" +
+      "Pastikan website menggunakan HTTPS.";
 
-document.getElementById("scanButton")
-.style.display =
-"none";
-
-
-document.getElementById("stopButton")
-.style.display =
-"block";
-
-
-document.getElementById("status")
-.innerHTML =
-"📷 <b>Kamera aktif</b><br>" +
-"Arahkan kamera ke QR.";
-
-})
-
-
-.catch(function(error) {
-
-
-console.log(error);
-
-
-scannerRunning =
-false;
-
-
-document.getElementById("status")
-.className =
-"status warning";
-
-
-document.getElementById("status")
-.innerHTML =
-"❌ Kamera tidak dapat dibuka.<br>" +
-"Pastikan website menggunakan HTTPS.";
-
-});
+  });
 
 }
 
@@ -597,448 +572,470 @@ document.getElementById("status")
 
 function qrSuccess(qrData) {
 
+  // ================================================
+  // CEGAH QR TERBACA BERKALI-KALI
+  // ================================================
 
-stopScanner();
+  if (!scannerRunning) {
 
+    return;
 
-// ===================================================
-// QR BOLEH BERISI:
-// INBOUND
-//
-// ATAU
-//
-// INBOUND|START
-//
-// SISTEM TETAP MENGGUNAKAN ACTION DARI DROPDOWN
-// ===================================================
+  }
 
 
-const parts =
-qrData.split("|");
+  scannerRunning =
+    false;
 
 
-const qrActivity =
-parts[0]
-.trim();
+  // ================================================
+  // STOP CAMERA
+  // ================================================
 
+  if (scanner) {
 
-// ===================================================
-// CEK ACTIVITY QR
-// ===================================================
+    scanner.stop()
 
-if (
-qrActivity.toLowerCase() !==
-currentActivity.toLowerCase()
-) {
+      .then(function() {
 
+        scanner.clear();
 
-document.getElementById("status")
-.className =
-"status warning";
+        showScanButton();
 
+        processQR(qrData);
 
-document.getElementById("status")
-.innerHTML =
-"⚠️ QR Activity tidak sesuai.<br>" +
-"Activity dipilih: " +
-currentActivity;
+      })
 
+      .catch(function() {
 
-return;
+        scanner.clear();
 
-}
+        showScanButton();
 
+        processQR(qrData);
 
-// ===================================================
-// SIMPAN TRANSACTION ID
-// ===================================================
+      });
 
-if (parts.length >= 3) {
+  }
+  else {
 
-currentTransaction =
-parts[0]
-.trim();
+    showScanButton();
 
-}
-else {
+    processQR(qrData);
 
-currentTransaction =
-qrActivity +
-"-" +
-Date.now();
-
-}
-
-
-// ===================================================
-// TAMPILKAN TRANSACTION
-// ===================================================
-
-document.getElementById("transaction")
-.innerText =
-currentTransaction;
-
-
-// ===================================================
-// KIRIM DATA
-// ===================================================
-
-sendToGoogleSheet();
+  }
 
 }
 
 
 // =====================================================
-// SEND TO GOOGLE APPS SCRIPT
+// PROSES HASIL QR
+// =====================================================
+
+function processQR(qrData) {
+
+  const qrActivity =
+    String(qrData)
+      .trim()
+      .split("|")[0]
+      .trim();
+
+
+  // ================================================
+  // CEK ACTIVITY
+  // ================================================
+
+  if (
+    qrActivity.toLowerCase() !==
+    currentActivity.toLowerCase()
+  ) {
+
+    document.getElementById("status")
+      .className =
+      "status warning";
+
+    document.getElementById("status")
+      .innerHTML =
+      "⚠️ QR tidak sesuai.<br>" +
+      "Pilih Activity: " +
+      currentActivity;
+
+    return;
+
+  }
+
+
+  // ================================================
+  // STATUS
+  // ================================================
+
+  document.getElementById("status")
+    .className =
+    "status";
+
+  document.getElementById("status")
+    .innerHTML =
+    "⏳ Memproses " +
+    currentAction +
+    "...";
+
+
+  // ================================================
+  // KIRIM KE APPS SCRIPT
+  // ================================================
+
+  sendToGoogleSheet();
+
+}
+
+
+// =====================================================
+// TAMPILKAN KEMBALI BUTTON SCAN
+// =====================================================
+
+function showScanButton() {
+
+  document.getElementById("scanButton")
+    .style.display =
+    "block";
+
+  document.getElementById("stopButton")
+    .style.display =
+    "none";
+
+}
+
+
+// =====================================================
+// SEND DATA
 // =====================================================
 
 function sendToGoogleSheet() {
 
+  const operator =
+    document.getElementById("operator")
+      .value
+      .trim();
 
-const operator =
-document.getElementById("operator")
-.value
-.trim();
+  const customerID =
+    document.getElementById("customerID")
+      .value;
 
+  const quantity =
+    document.getElementById("quantity")
+      .value;
 
-const customerID =
-document.getElementById("customerID")
-.value;
 
+  // ================================================
+  // CALLBACK
+  // ================================================
 
-const quantity =
-document.getElementById("quantity")
-.value;
+  const callbackName =
+    "callback_" +
+    Date.now();
 
 
-// ===================================================
-// STATUS
-// ===================================================
+  window[callbackName] =
+    function(result) {
 
-document.getElementById("status")
-.className =
-"status";
 
+      delete window[callbackName];
 
-document.getElementById("status")
-.innerHTML =
-"⏳ Memproses...";
 
+      const script =
+        document.getElementById(
+          callbackName
+        );
 
-// ===================================================
-// CALLBACK
-// ===================================================
 
-const callbackName =
-"callback_" +
-Date.now();
+      if (script) {
 
+        script.remove();
 
-window[callbackName] =
-function(result) {
+      }
 
 
-delete window[callbackName];
+      // ============================================
+      // START BERHASIL
+      // ============================================
 
+      if (
+        result.success &&
+        result.type === "START"
+      ) {
 
-const script =
-document.getElementById(
-callbackName
-);
+        document.getElementById(
+          "transaction"
+        )
+        .innerText =
+        result.transactionID;
 
 
-if (script) {
+        document.getElementById(
+          "status"
+        )
+        .className =
+        "status success";
 
-script.remove();
 
-}
+        document.getElementById(
+          "status"
+        )
+        .innerHTML =
+        "🟢 <b>START BERHASIL</b><br>" +
+        currentActivity +
+        "<br><br>" +
+        "Status: Running";
 
 
-// =================================================
-// START BERHASIL
-// =================================================
+        return;
 
-if (
-result.success &&
-result.type === "START"
-) {
+      }
 
 
-currentTransaction =
-result.transactionID;
+      // ============================================
+      // END BERHASIL
+      // ============================================
 
+      if (
+        result.success &&
+        result.type === "FINISH"
+      ) {
 
-document.getElementById(
-"transaction"
-)
-.innerText =
-currentTransaction;
+        document.getElementById(
+          "transaction"
+        )
+        .innerText =
+        result.transactionID;
 
 
-document.getElementById(
-"status"
-)
-.className =
-"status success";
+        document.getElementById(
+          "status"
+        )
+        .className =
+        "status success";
 
 
-document.getElementById(
-"status"
-)
-.innerHTML =
-"🟢 <b>START BERHASIL</b><br>" +
-currentActivity +
-"<br><br>" +
-"Silakan bekerja.";
+        document.getElementById(
+          "status"
+        )
+        .innerHTML =
+        "✅ <b>SELESAI</b><br>" +
+        currentActivity +
+        "<br>" +
+        "Quantity: " +
+        result.quantity +
+        "<br>" +
+        "Duration: " +
+        result.duration +
+        " menit";
 
 
-return;
+        return;
 
-}
+      }
 
 
-// =================================================
-// FINISH BERHASIL
-// =================================================
+      // ============================================
+      // ALREADY RUNNING
+      // ============================================
 
-if (
-result.success &&
-result.type === "FINISH"
-) {
+      if (
+        result.type ===
+        "ALREADY_RUNNING"
+      ) {
 
+        document.getElementById(
+          "status"
+        )
+        .className =
+        "status warning";
 
-document.getElementById(
-"status"
-)
-.className =
-"status success";
 
+        document.getElementById(
+          "status"
+        )
+        .innerHTML =
+        "⚠️ Activity ini masih Running.";
 
-document.getElementById(
-"status"
-)
-.innerHTML =
-"✅ <b>SELESAI</b><br>" +
-currentActivity +
-"<br>" +
-"Duration: " +
-result.duration +
-" menit";
 
+        return;
 
-return;
+      }
 
-}
 
+      // ============================================
+      // NEED QUANTITY
+      // ============================================
 
-// =================================================
-// ALREADY RUNNING
-// =================================================
+      if (
+        result.type ===
+        "NEED_QUANTITY"
+      ) {
 
-if (
-result.type ===
-"ALREADY_RUNNING"
-) {
+        document.getElementById(
+          "status"
+        )
+        .className =
+        "status warning";
 
 
-document.getElementById(
-"status"
-)
-.className =
-"status warning";
+        document.getElementById(
+          "status"
+        )
+        .innerHTML =
+        "⚠️ Isi Quantity terlebih dahulu.";
 
 
-document.getElementById(
-"status"
-)
-.innerHTML =
-"⚠️ Activity ini masih Running.";
+        return;
 
+      }
 
-return;
 
-}
+      // ============================================
+      // NO RUNNING
+      // ============================================
 
+      if (
+        result.type ===
+        "NO_RUNNING"
+      ) {
 
-// =================================================
-// NO RUNNING
-// =================================================
+        document.getElementById(
+          "status"
+        )
+        .className =
+        "status warning";
 
-if (
-result.type ===
-"NO_RUNNING"
-) {
 
+        document.getElementById(
+          "status"
+        )
+        .innerHTML =
+        "⚠️ Tidak ditemukan data Running.";
 
-document.getElementById(
-"status"
-)
-.className =
-"status warning";
 
+        return;
 
-document.getElementById(
-"status"
-)
-.innerHTML =
-"⚠️ Tidak ditemukan pekerjaan Running.";
+      }
 
 
-return;
+      // ============================================
+      // ERROR
+      // ============================================
 
-}
+      document.getElementById(
+        "status"
+      )
+      .className =
+      "status warning";
 
 
-// =================================================
-// ERROR
-// =================================================
+      document.getElementById(
+        "status"
+      )
+      .innerHTML =
+      "❌ " +
+      (
+        result.message ||
+        "Data gagal diproses."
+      );
 
-document.getElementById(
-"status"
-)
-.className =
-"status warning";
+    };
 
 
-document.getElementById(
-"status"
-)
-.innerHTML =
-"❌ " +
-(
-result.message ||
-"Data gagal diproses."
-);
+  // ================================================
+  // PARAMETER
+  // ================================================
 
-};
+  const params =
+    new URLSearchParams({
 
+      api:
+        "processScan",
 
-// ===================================================
-// PARAMETER API
-// ===================================================
+      callback:
+        callbackName,
 
-const params =
-new URLSearchParams({
+      operator:
+        operator,
 
-api:
-"processScan",
+      customerID:
+        customerID,
 
-callback:
-callbackName,
+      activity:
+        currentActivity,
 
-operator:
-operator,
+      department:
+        currentActivity,
 
-customerID:
-customerID,
+      quantity:
+        quantity,
 
-transactionID:
-currentTransaction,
+      action:
+        currentAction
 
-department:
-currentActivity,
+    });
 
-activity:
-currentActivity,
 
-quantity:
-quantity,
+  // ================================================
+  // JSONP
+  // ================================================
 
-action:
-currentAction
+  const script =
+    document.createElement("script");
 
-});
 
+  script.id =
+    callbackName;
 
-// ===================================================
-// JSONP
-// ===================================================
 
-const script =
-document.createElement("script");
+  script.src =
+    APPS_SCRIPT_URL +
+    "?" +
+    params.toString();
 
 
-script.id =
-callbackName;
-
-
-script.src =
-APPS_SCRIPT_URL +
-"?" +
-params.toString();
-
-
-document.body.appendChild(
-script
-);
+  document.body.appendChild(
+    script
+  );
 
 }
 
 
 // =====================================================
-// STOP CAMERA
+// STOP CAMERA MANUAL
 // =====================================================
 
 function stopScanner() {
 
+  if (
+    scanner &&
+    scannerRunning
+  ) {
 
-if (
-scanner &&
-scannerRunning
-) {
+    scanner.stop()
 
+      .then(function() {
 
-scanner.stop()
+        scanner.clear();
 
-.then(function() {
+        scannerRunning =
+          false;
 
+        showScanButton();
 
-scanner.clear();
+      })
 
+      .catch(function() {
 
-scannerRunning =
-false;
+        scannerRunning =
+          false;
 
+        showScanButton();
 
-document.getElementById(
-"scanButton"
-)
-.style.display =
-"block";
+      });
 
-
-document.getElementById(
-"stopButton"
-)
-.style.display =
-"none";
-
-})
-
-
-.catch(function() {
-
-
-scannerRunning =
-false;
-
-
-document.getElementById(
-"scanButton"
-)
-.style.display =
-"block";
-
-
-document.getElementById(
-"stopButton"
-)
-.style.display =
-"none";
-
-});
-
-}
+  }
 
 }
 
