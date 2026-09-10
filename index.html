@@ -1,530 +1,638 @@
-const SHEET_NAME = "ACTIVITY_TRACKING";
+<!DOCTYPE html>
+<html lang="id">
 
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-// =====================================================
-// DO GET
-// =====================================================
+<title>Warehouse Activity Tracking</title>
 
-function doGet(e) {
+<script src="https://unpkg.com/html5-qrcode"></script>
 
-  // API dari website GitHub
-  if (e && e.parameter && e.parameter.api === "processScan") {
+<style>
 
-    const callback =
-      e.parameter.callback || "callback";
-
-    const data = {
-
-      operator:
-        e.parameter.operator || "",
-
-      customerID:
-        e.parameter.customerID || "",
-
-      transactionID:
-        e.parameter.transactionID || "",
-
-      department:
-        e.parameter.department || "",
-
-      activity:
-        e.parameter.activity || "",
-
-      quantity:
-        e.parameter.quantity || "",
-
-      action:
-        e.parameter.action || ""
-
-    };
-
-    const result =
-      processScan(data);
-
-    return ContentService
-      .createTextOutput(
-        callback +
-        "(" +
-        JSON.stringify(result) +
-        ")"
-      )
-      .setMimeType(
-        ContentService.MimeType.JAVASCRIPT
-      );
-  }
-
-
-  return HtmlService
-    .createHtmlOutputFromFile("Index")
-    .setTitle("Warehouse Activity Tracking");
+* {
+  box-sizing: border-box;
 }
 
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  margin: 0;
+  padding: 15px;
+}
+
+.container {
+  max-width: 420px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+h2 {
+  text-align: center;
+  color: #17365d;
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-top: 15px;
+  margin-bottom: 6px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  background: white;
+}
+
+.info {
+  background: #eef7ee;
+  padding: 13px;
+  border-radius: 8px;
+  margin-top: 15px;
+  line-height: 1.7;
+}
+
+.activity {
+  background: #eef5ff;
+  padding: 13px;
+  border-radius: 8px;
+  margin-top: 10px;
+  line-height: 1.7;
+}
 
+.scanButton {
+  width: 100%;
+  padding: 15px;
+  margin-top: 18px;
+  background: #17365d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: bold;
+}
 
-// =====================================================
-// PROCESS SCAN
-// =====================================================
+.stopButton {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  background: #ddd;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  display: none;
+}
 
-function processScan(data) {
+#reader {
+  width: 100%;
+  margin-top: 15px;
+}
 
-  const sheet =
-    SpreadsheetApp
-      .getActiveSpreadsheet()
-      .getSheetByName(SHEET_NAME);
+.status {
+  padding: 13px;
+  margin-top: 15px;
+  background: #f1f3f5;
+  border-radius: 8px;
+  text-align: center;
+  line-height: 1.5;
+}
 
+.success {
+  background: #e8f5e9;
+}
 
-  if (!sheet) {
+.warning {
+  background: #fff3cd;
+}
 
-    return {
-      success: false,
-      type: "ERROR",
-      message:
-        "Sheet ACTIVITY_TRACKING tidak ditemukan."
-    };
+</style>
+</head>
 
-  }
 
+<body>
 
-  // ===================================================
-  // DATA
-  // ===================================================
+<div class="container">
 
-  const operator =
-    String(data.operator || "").trim();
+<h2>🏭 Warehouse Tracking</h2>
 
-  const customerID =
-    String(data.customerID || "").trim();
 
-  const activity =
-    String(data.activity || "").trim();
+<label>Nama Operator</label>
 
-  const quantity =
-    String(data.quantity || "").trim();
+<input
+  id="operator"
+  type="text"
+  placeholder="Masukkan nama operator">
 
-  const action =
-    String(data.action || "").trim().toUpperCase();
 
+<label>Customer ID</label>
 
-  // ===================================================
-  // VALIDASI
-  // ===================================================
+<select id="customerID">
 
-  if (!operator) {
+<option value="">Pilih Customer ID</option>
 
-    return {
-      success: false,
-      type: "ERROR",
-      message:
-        "Nama Operator belum diisi."
-    };
+<option value="PMID">PMID</option>
 
-  }
+<option value="HMS">HMS</option>
 
+<option value="CLOVE">CLOVE</option>
 
-  if (!customerID) {
+</select>
 
-    return {
-      success: false,
-      type: "ERROR",
-      message:
-        "Customer ID belum dipilih."
-    };
 
-  }
+<label>Activity</label>
 
+<select id="activitySelect">
 
-  if (!activity) {
+<option value="">Pilih Activity</option>
 
-    return {
-      success: false,
-      type: "ERROR",
-      message:
-        "Activity belum dipilih."
-    };
+<option value="Inbound">Inbound</option>
 
-  }
+<option value="Inventory">Inventory</option>
 
+<option value="Outbound">Outbound</option>
 
-  if (
-    action !== "START" &&
-    action !== "END"
-  ) {
+<option value="Auger">Auger</option>
 
-    return {
-      success: false,
-      type: "ERROR",
-      message:
-        "QR harus memiliki START atau END."
-    };
+<option value="Slicing">Slicing</option>
 
-  }
+<option value="Rebox">Rebox</option>
 
+</select>
 
-  // ===================================================
-  // DATA SHEET
-  // ===================================================
 
-  const rows =
-    sheet
-      .getDataRange()
-      .getValues();
+<div class="info">
 
-  const now =
-    new Date();
+<b>Transaction ID</b><br>
 
+<span id="transaction">
+Akan dibuat otomatis
+</span>
 
-  // ===================================================
-  // START
-  // ===================================================
+</div>
 
-  if (action === "START") {
 
-    // -----------------------------------------------
-    // Cek apakah masih ada pekerjaan Running
-    // -----------------------------------------------
+<div class="activity">
 
-    for (
-      let i = rows.length - 1;
-      i >= 1;
-      i--
-    ) {
+<b>Activity:</b>
+<span id="activity">-</span>
 
-      const rowCustomer =
-        String(rows[i][2]).trim();
+<br>
 
-      const rowActivity =
-        String(rows[i][4]).trim();
+<b>Action:</b>
+<span id="action">-</span>
 
-      const rowStatus =
-        String(rows[i][9]).trim();
+</div>
 
-      const rowOperator =
-        String(rows[i][10]).trim();
 
+<label>Quantity</label>
 
-      if (
-        rowCustomer === customerID &&
-        rowActivity === activity &&
-        rowStatus === "Running" &&
-        rowOperator === operator
-      ) {
+<input
+  id="quantity"
+  type="number"
+  placeholder="Isi Quantity saat END">
 
-        return {
 
-          success: false,
+<button
+  id="scanButton"
+  class="scanButton"
+  onclick="startScanner()">
 
-          type: "ALREADY_RUNNING",
+📷 SCAN QR
 
-          message:
-            "Activity ini masih Running."
+</button>
 
-        };
 
-      }
+<button
+  id="stopButton"
+  class="stopButton"
+  onclick="stopScanner()">
 
-    }
+Tutup Kamera
 
+</button>
 
-    // -----------------------------------------------
-    // Buat Transaction ID otomatis
-    // -----------------------------------------------
 
-    const transactionID =
-      generateTransactionID(
-        activity,
-        sheet
-      );
+<div id="reader"></div>
 
 
-    // -----------------------------------------------
-    // Tracking ID
-    // -----------------------------------------------
+<div id="status" class="status">
 
-    const lastRow =
-      sheet.getLastRow();
+Pilih Customer ID dan Activity,
+lalu scan QR START.
 
-    const trackingID =
-      "TRK-" +
-      String(lastRow)
-        .padStart(3, "0");
+</div>
 
+</div>
 
-    // -----------------------------------------------
-    // Department
-    // -----------------------------------------------
 
-    const department =
-      activity.toUpperCase();
+<script>
 
+const APPS_SCRIPT_URL =
+"https://script.google.com/macros/s/AKfycbyp9hUopC-ZLxGG2KiStLBQ8oDnNC-sKqOp1YdYZpkx4mPm2SpEXkckex5TI69uJIjXgg/exec";
 
-    // -----------------------------------------------
-    // Tambahkan data
-    // -----------------------------------------------
 
-    sheet.appendRow([
+let scanner = null;
+let scannerRunning = false;
 
-      trackingID,
+let currentActivity = "";
+let currentAction = "";
+let currentTransaction = "";
 
-      transactionID,
 
-      customerID,
+function startScanner() {
 
-      department,
+const operator =
+document.getElementById("operator").value.trim();
 
-      activity,
+const customerID =
+document.getElementById("customerID").value;
 
-      now,
+const activity =
+document.getElementById("activitySelect").value;
 
-      "",
 
-      "",
+if (!operator) {
 
-      "",
-
-      "Running",
-
-      operator
-
-    ]);
-
-
-    return {
-
-      success: true,
-
-      type: "START",
-
-      trackingID:
-        trackingID,
-
-      transactionID:
-        transactionID
-
-    };
-
-  }
-
-
-
-  // ===================================================
-  // END
-  // ===================================================
-
-  if (action === "END") {
-
-    // -----------------------------------------------
-    // Quantity wajib diisi
-    // -----------------------------------------------
-
-    if (quantity === "") {
-
-      return {
-
-        success: false,
-
-        type: "NEED_QUANTITY",
-
-        message:
-          "Isi Quantity terlebih dahulu."
-
-      };
-
-    }
-
-
-    // -----------------------------------------------
-    // Cari pekerjaan Running
-    // -----------------------------------------------
-
-    for (
-      let i = rows.length - 1;
-      i >= 1;
-      i--
-    ) {
-
-      const rowCustomer =
-        String(rows[i][2]).trim();
-
-      const rowActivity =
-        String(rows[i][4]).trim();
-
-      const rowStatus =
-        String(rows[i][9]).trim();
-
-      const rowOperator =
-        String(rows[i][10]).trim();
-
-
-      if (
-        rowCustomer === customerID &&
-        rowActivity === activity &&
-        rowStatus === "Running" &&
-        rowOperator === operator
-      ) {
-
-        // -------------------------------------------
-        // Start Time
-        // -------------------------------------------
-
-        const startTime =
-          new Date(rows[i][5]);
-
-
-        // -------------------------------------------
-        // Duration
-        // -------------------------------------------
-
-        const duration =
-          Math.round(
-            (now - startTime) / 60000
-          );
-
-
-        // -------------------------------------------
-        // Update Finish
-        // -------------------------------------------
-
-        sheet
-          .getRange(i + 1, 7)
-          .setValue(now);
-
-
-        sheet
-          .getRange(i + 1, 8)
-          .setValue(duration);
-
-
-        sheet
-          .getRange(i + 1, 9)
-          .setValue(quantity);
-
-
-        sheet
-          .getRange(i + 1, 10)
-          .setValue("Completed");
-
-
-        return {
-
-          success: true,
-
-          type: "FINISH",
-
-          transactionID:
-            rows[i][1],
-
-          duration:
-            duration
-
-        };
-
-      }
-
-    }
-
-
-    // -----------------------------------------------
-    // Tidak menemukan Running
-    // -----------------------------------------------
-
-    return {
-
-      success: false,
-
-      type: "NO_RUNNING",
-
-      message:
-        "Tidak ditemukan pekerjaan Running untuk Activity ini."
-
-    };
-
-  }
+alert("Isi Nama Operator terlebih dahulu.");
+return;
 
 }
 
 
+if (!customerID) {
 
-// =====================================================
-// GENERATE TRANSACTION ID
-// =====================================================
+alert("Pilih Customer ID terlebih dahulu.");
+return;
 
-function generateTransactionID(
-  activity,
-  sheet
+}
+
+
+if (!activity) {
+
+alert("Pilih Activity terlebih dahulu.");
+return;
+
+}
+
+
+if (scannerRunning) return;
+
+
+currentActivity = activity;
+
+
+document.getElementById("activity")
+.innerText = activity;
+
+
+document.getElementById("status")
+.innerHTML =
+"📷 <b>Kamera aktif</b><br>Arahkan kamera ke QR.";
+
+
+scanner = new Html5Qrcode("reader");
+
+
+scanner.start(
+
+{ facingMode: "environment" },
+
+{
+fps: 10,
+qrbox: {
+width: 250,
+height: 250
+}
+},
+
+function(decodedText) {
+
+qrSuccess(decodedText);
+
+},
+
+function(errorMessage) {
+
+// abaikan error frame
+
+}
+
+)
+
+.then(function() {
+
+scannerRunning = true;
+
+document.getElementById("scanButton")
+.style.display = "none";
+
+document.getElementById("stopButton")
+.style.display = "block";
+
+})
+
+.catch(function(error) {
+
+console.log(error);
+
+document.getElementById("status")
+.className = "status warning";
+
+document.getElementById("status")
+.innerHTML =
+"❌ Kamera tidak dapat dibuka.";
+
+});
+
+}
+
+
+function qrSuccess(qrData) {
+
+stopScanner();
+
+
+const parts = qrData.split("|");
+
+
+if (parts.length < 2) {
+
+document.getElementById("status")
+.className = "status warning";
+
+document.getElementById("status").innerHTML =
+"❌ Format QR salah.<br>Contoh: INBOUND|START";
+
+return;
+
+}
+
+
+const qrActivity =
+parts[0].trim();
+
+const qrAction =
+parts[1].trim().toUpperCase();
+
+
+if (
+qrActivity.toLowerCase() !==
+currentActivity.toLowerCase()
 ) {
 
-  const prefixMap = {
+document.getElementById("status")
+.className = "status warning";
 
-    "Inbound":
-      "INB",
+document.getElementById("status").innerHTML =
+"⚠️ Activity QR tidak sesuai.<br>" +
+"Activity dipilih: " +
+currentActivity;
 
-    "Inventory":
-      "INV",
-
-    "Outbound":
-      "OUT",
-
-    "Auger":
-      "AUG",
-
-    "Slicing":
-      "SLC",
-
-    "Rebox":
-      "RBX"
-
-  };
-
-
-  const prefix =
-    prefixMap[activity] || "TRX";
-
-
-  const date =
-    Utilities.formatDate(
-      new Date(),
-      Session.getScriptTimeZone(),
-      "yyyyMMdd"
-    );
-
-
-  const rows =
-    sheet.getDataRange().getValues();
-
-
-  let count = 0;
-
-
-  for (
-    let i = 1;
-    i < rows.length;
-    i++
-  ) {
-
-    const transaction =
-      String(rows[i][1] || "");
-
-
-    if (
-      transaction.indexOf(
-        prefix + "-" + date
-      ) === 0
-    ) {
-
-      count++;
-
-    }
-
-  }
-
-
-  return (
-    prefix +
-    "-" +
-    date +
-    "-" +
-    String(count + 1)
-      .padStart(3, "0")
-  );
+return;
 
 }
+
+
+if (
+qrAction !== "START" &&
+qrAction !== "END"
+) {
+
+document.getElementById("status")
+.className = "status warning";
+
+document.getElementById("status").innerHTML =
+"❌ QR harus START atau END.";
+
+return;
+
+}
+
+
+currentAction = qrAction;
+
+
+document.getElementById("action")
+.innerText = currentAction;
+
+
+if (currentAction === "END") {
+
+const quantity =
+document.getElementById("quantity").value;
+
+if (!quantity) {
+
+document.getElementById("status")
+.className = "status warning";
+
+document.getElementById("status").innerHTML =
+"⚠️ Isi Quantity terlebih dahulu.";
+
+return;
+
+}
+
+}
+
+
+sendToGoogleSheet();
+
+}
+
+
+function sendToGoogleSheet() {
+
+const operator =
+document.getElementById("operator").value.trim();
+
+const customerID =
+document.getElementById("customerID").value;
+
+const quantity =
+document.getElementById("quantity").value;
+
+
+document.getElementById("status")
+.className = "status";
+
+document.getElementById("status")
+.innerHTML = "⏳ Memproses...";
+
+
+const callbackName =
+"callback_" + Date.now();
+
+
+window[callbackName] =
+function(result) {
+
+
+delete window[callbackName];
+
+
+const script =
+document.getElementById(callbackName);
+
+if (script) {
+script.remove();
+}
+
+
+if (
+result.success &&
+result.type === "START"
+) {
+
+currentTransaction =
+result.transactionID;
+
+
+document.getElementById("transaction")
+.innerText =
+currentTransaction;
+
+
+document.getElementById("status")
+.className =
+"status success";
+
+document.getElementById("status")
+.innerHTML =
+"🟢 <b>START BERHASIL</b><br>" +
+currentActivity +
+"<br><br>" +
+"Silakan bekerja.";
+
+return;
+
+}
+
+
+if (
+result.success &&
+result.type === "FINISH"
+) {
+
+document.getElementById("status")
+.className =
+"status success";
+
+document.getElementById("status")
+.innerHTML =
+"✅ <b>SELESAI</b><br>" +
+currentActivity +
+"<br>" +
+"Duration: " +
+result.duration +
+" menit";
+
+return;
+
+}
+
+
+document.getElementById("status")
+.className =
+"status warning";
+
+document.getElementById("status")
+.innerHTML =
+"❌ " +
+(result.message || "Data gagal diproses.");
+
+};
+
+
+const params =
+new URLSearchParams({
+
+api: "processScan",
+
+callback: callbackName,
+
+operator: operator,
+
+customerID: customerID,
+
+activity: currentActivity,
+
+department: currentActivity,
+
+quantity: quantity,
+
+action: currentAction
+
+});
+
+
+const script =
+document.createElement("script");
+
+script.id = callbackName;
+
+script.src =
+APPS_SCRIPT_URL +
+"?" +
+params.toString();
+
+
+document.body.appendChild(script);
+
+}
+
+
+function stopScanner() {
+
+if (
+scanner &&
+scannerRunning
+) {
+
+scanner.stop()
+
+.then(function() {
+
+scanner.clear();
+
+scannerRunning = false;
+
+document.getElementById("scanButton")
+.style.display = "block";
+
+document.getElementById("stopButton")
+.style.display = "none";
+
+})
+
+.catch(function() {
+
+scannerRunning = false;
+
+document.getElementById("scanButton")
+.style.display = "block";
+
+document.getElementById("stopButton")
+.style.display = "none";
+
+});
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
