@@ -5,17 +5,11 @@
 
 <meta charset="UTF-8">
 
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1"
->
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>
-Warehouse Activity Tracking
-</title>
+<title>Warehouse Activity Tracking</title>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
-
 
 <style>
 
@@ -23,283 +17,130 @@ Warehouse Activity Tracking
   box-sizing: border-box;
 }
 
-
 body {
-
-  font-family:
-    Arial,
-    sans-serif;
-
-  background:
-    #f4f6f8;
-
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
   margin: 0;
-
   padding: 15px;
 }
 
-
 .container {
-
   max-width: 430px;
-
   margin: auto;
-
-  background:
-    white;
-
+  background: white;
   padding: 20px;
-
   border-radius: 15px;
-
-  box-shadow:
-    0 2px 10px
-    rgba(0,0,0,0.08);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }
-
 
 h2 {
-
-  text-align:
-    center;
-
-  color:
-    #17365d;
-
-  margin-top:
-    0;
-
-  margin-bottom:
-    20px;
+  text-align: center;
+  color: #17365d;
+  margin-top: 0;
+  margin-bottom: 20px;
 }
-
 
 label {
-
-  display:
-    block;
-
-  font-weight:
-    bold;
-
-  margin-top:
-    14px;
-
-  margin-bottom:
-    6px;
+  display: block;
+  font-weight: bold;
+  margin-top: 14px;
+  margin-bottom: 6px;
 }
-
 
 input,
 select {
-
-  width:
-    100%;
-
-  padding:
-    13px;
-
-  border:
-    1px solid #ccc;
-
-  border-radius:
-    8px;
-
-  font-size:
-    16px;
-
-  background:
-    white;
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  background: white;
 }
-
 
 .info {
-
-  background:
-    #eef7ee;
-
-  padding:
-    13px;
-
-  border-radius:
-    8px;
-
-  margin-top:
-    15px;
-
-  line-height:
-    1.7;
+  background: #eef7ee;
+  padding: 13px;
+  border-radius: 8px;
+  margin-top: 15px;
+  line-height: 1.7;
 }
-
 
 .activityBox {
-
-  background:
-    #eef5ff;
-
-  padding:
-    13px;
-
-  border-radius:
-    8px;
-
-  margin-top:
-    10px;
-
-  line-height:
-    1.7;
+  background: #eef5ff;
+  padding: 13px;
+  border-radius: 8px;
+  margin-top: 10px;
+  line-height: 1.7;
 }
-
 
 .scanButton {
-
-  width:
-    100%;
-
-  padding:
-    15px;
-
-  margin-top:
-    18px;
-
-  background:
-    #17365d;
-
-  color:
-    white;
-
-  border:
-    none;
-
-  border-radius:
-    8px;
-
-  font-size:
-    17px;
-
-  font-weight:
-    bold;
-
-  cursor:
-    pointer;
+  width: 100%;
+  padding: 15px;
+  margin-top: 18px;
+  background: #17365d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
 }
-
 
 .stopButton {
-
-  width:
-    100%;
-
-  padding:
-    12px;
-
-  margin-top:
-    8px;
-
-  background:
-    #ddd;
-
-  color:
-    #333;
-
-  border:
-    none;
-
-  border-radius:
-    8px;
-
-  font-size:
-    15px;
-
-  display:
-    none;
-
-  cursor:
-    pointer;
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  background: #ddd;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  display: none;
+  cursor: pointer;
 }
-
 
 #reader {
-
-  width:
-    100%;
-
-  margin-top:
-    15px;
+  width: 100%;
+  margin-top: 15px;
 }
-
 
 .status {
-
-  padding:
-    13px;
-
-  margin-top:
-    15px;
-
-  background:
-    #f1f3f5;
-
-  border-radius:
-    8px;
-
-  text-align:
-    center;
-
-  line-height:
-    1.5;
+  padding: 13px;
+  margin-top: 15px;
+  background: #f1f3f5;
+  border-radius: 8px;
+  text-align: center;
+  line-height: 1.5;
 }
-
 
 .success {
-
-  background:
-    #e8f5e9;
+  background: #e8f5e9;
 }
-
 
 .warning {
-
-  background:
-    #fff3cd;
+  background: #fff3cd;
 }
 
-
 .smallText {
-
-  font-size:
-    13px;
-
-  color:
-    #666;
-
-  margin-top:
-    5px;
+  font-size: 13px;
+  color: #666;
+  margin-top: 5px;
 }
 
 </style>
 
 </head>
 
-
 <body>
-
 
 <div class="container">
 
-
-<h2>
-🏭 Warehouse Activity Tracking
-</h2>
+<h2>🏭 Warehouse Activity Tracking</h2>
 
 
-<!-- ========================= -->
 <!-- OPERATOR -->
-<!-- ========================= -->
 
-<label>
-Nama Operator
-</label>
+<label>Nama Operator</label>
 
 <input
   id="operator"
@@ -308,13 +149,9 @@ Nama Operator
 >
 
 
-<!-- ========================= -->
 <!-- CUSTOMER -->
-<!-- ========================= -->
 
-<label>
-Customer ID
-</label>
+<label>Customer ID</label>
 
 <select id="customerID">
 
@@ -337,13 +174,9 @@ Customer ID
 </select>
 
 
-<!-- ========================= -->
-<!-- ACTIVITY -->
-<!-- ========================= -->
+<!-- ACTIVITY BESAR -->
 
-<label>
-Activity
-</label>
+<label>Activity</label>
 
 <select
   id="departmentSelect"
@@ -362,6 +195,10 @@ Activity
     Movement
   </option>
 
+  <option value="Outbound">
+    Outbound
+  </option>
+
   <option value="Auger">
     Auger
   </option>
@@ -374,20 +211,12 @@ Activity
     Rebox
   </option>
 
-  <option value="Outbound">
-    Outbound
-  </option>
-
 </select>
 
 
-<!-- ========================= -->
 <!-- SUB ACTIVITY -->
-<!-- ========================= -->
 
-<label>
-Sub Activity
-</label>
+<label>Sub Activity</label>
 
 <select id="activitySelect">
 
@@ -398,17 +227,13 @@ Sub Activity
 </select>
 
 <div class="smallText">
-  Pilih satu Sub Activity untuk setiap transaksi.
+  Pilih satu Sub Activity.
 </div>
 
 
-<!-- ========================= -->
 <!-- ACTION -->
-<!-- ========================= -->
 
-<label>
-Action
-</label>
+<label>Action</label>
 
 <select id="actionSelect">
 
@@ -427,15 +252,11 @@ Action
 </select>
 
 
-<!-- ========================= -->
 <!-- TRANSACTION -->
-<!-- ========================= -->
 
 <div class="info">
 
-  <b>
-    Transaction ID
-  </b>
+  <b>Transaction ID</b>
 
   <br>
 
@@ -446,50 +267,29 @@ Action
 </div>
 
 
-<!-- ========================= -->
-<!-- SELECTED ACTIVITY -->
-<!-- ========================= -->
+<!-- DISPLAY -->
 
 <div class="activityBox">
 
-  <b>
-    Activity:
-  </b>
-
-  <span id="activity">
-    -
-  </span>
+  <b>Activity:</b>
+  <span id="activity">-</span>
 
   <br>
 
-  <b>
-    Sub Activity:
-  </b>
-
-  <span id="subActivity">
-    -
-  </span>
+  <b>Sub Activity:</b>
+  <span id="subActivity">-</span>
 
   <br>
 
-  <b>
-    Action:
-  </b>
-
-  <span id="action">
-    -
-  </span>
+  <b>Action:</b>
+  <span id="action">-</span>
 
 </div>
 
 
-<!-- ========================= -->
 <!-- QUANTITY -->
-<!-- ========================= -->
 
-<label>
-Quantity
-</label>
+<label>Quantity</label>
 
 <input
   id="quantity"
@@ -499,9 +299,7 @@ Quantity
 >
 
 
-<!-- ========================= -->
 <!-- SCAN -->
-<!-- ========================= -->
 
 <button
   id="scanButton"
@@ -510,7 +308,6 @@ Quantity
 >
   📷 SCAN QR
 </button>
-
 
 <button
   id="stopButton"
@@ -524,9 +321,7 @@ Quantity
 <div id="reader"></div>
 
 
-<!-- ========================= -->
 <!-- STATUS -->
-<!-- ========================= -->
 
 <div
   id="status"
@@ -536,16 +331,15 @@ Quantity
   dan Action lalu scan QR.
 </div>
 
-
 </div>
 
 
 <script>
 
 
-/* ==================================================
-   APPS SCRIPT URL
-   ================================================== */
+/* ==========================================
+   APPS SCRIPT
+   ========================================== */
 
 const APPS_SCRIPT_URL =
 "https://script.google.com/macros/s/AKfycbyp9hUopC-ZLxGG2KiStLBQ8oDnNC-sKqOp1YdYZpkx4mPm2SpEXkckex5TI69uJIjXgg/exec";
@@ -562,18 +356,13 @@ let currentActivity = "";
 let currentAction = "";
 
 
-/* ==================================================
+/* ==========================================
    MASTER SUB ACTIVITY
-   ================================================== */
+   ========================================== */
 
 const subActivities = {
 
-
-  /* =========================
-     INBOUND
-     ========================= */
-
-  "Inbound": [
+  Inbound: [
 
     "Preparation",
 
@@ -592,11 +381,7 @@ const subActivities = {
   ],
 
 
-  /* =========================
-     MOVEMENT
-     ========================= */
-
-  "Movement": [
+  Movement: [
 
     "Preparation",
 
@@ -617,90 +402,7 @@ const subActivities = {
   ],
 
 
-  /* =========================
-     AUGER
-     ========================= */
-
-  "Auger": [
-
-    "Moving Box",
-
-    "Opening Box",
-
-    "Taking Sample 1",
-
-    "Sample Packing 1",
-
-    "Sample Weighing 1",
-
-    "Sample Labelling 1",
-
-    "Taking Sample 2",
-
-    "Sample Packing 2",
-
-    "Sample Weighing 2",
-
-    "Sample Labelling 2",
-
-    "Closing Box",
-
-    "Return Box"
-
-  ],
-
-
-  /* =========================
-     SLICING
-     ========================= */
-
-  "Slicing": [
-
-    "Opening Strap",
-
-    "Opening Box",
-
-    "Box Positioning",
-
-    "Box Installation",
-
-    "Slicing",
-
-    "Bottom Box Installation",
-
-    "Strapping",
-
-    "Box Stacking",
-
-    "Weighing & Strapping"
-
-  ],
-
-
-  /* =========================
-     REBOX
-     ========================= */
-
-  "Rebox": [
-
-    "Opening Strap",
-
-    "Bottom Box Replacement",
-
-    "Strapping",
-
-    "Serial Number Printing",
-
-    "Serial Number Labelling"
-
-  ],
-
-
-  /* =========================
-     OUTBOUND
-     ========================= */
-
-  "Outbound": [
+  Outbound: [
 
     "Preparation 1",
 
@@ -742,36 +444,95 @@ const subActivities = {
 
     "Report Outbound"
 
+  ],
+
+
+  Auger: [
+
+    "Moving Box",
+
+    "Opening Box",
+
+    "Taking Sample 1",
+
+    "Sample Packing 1",
+
+    "Sample Weighing 1",
+
+    "Sample Labelling 1",
+
+    "Taking Sample 2",
+
+    "Sample Packing 2",
+
+    "Sample Weighing 2",
+
+    "Sample Labelling 2",
+
+    "Closing Box",
+
+    "Return Box"
+
+  ],
+
+
+  Slicing: [
+
+    "Opening Strap",
+
+    "Opening Box",
+
+    "Box Positioning",
+
+    "Box Installation",
+
+    "Slicing",
+
+    "Bottom Box Installation",
+
+    "Strapping",
+
+    "Box Stacking",
+
+    "Weighing & Strapping"
+
+  ],
+
+
+  Rebox: [
+
+    "Opening Strap",
+
+    "Bottom Box Replacement",
+
+    "Strapping",
+
+    "Serial Number Printing",
+
+    "Serial Number Labelling"
+
   ]
 
 };
 
 
-/* ==================================================
+/* ==========================================
    LOAD SUB ACTIVITY
-   ================================================== */
+   ========================================== */
 
 function loadSubActivities() {
 
-
   const department =
     document
-      .getElementById(
-        "departmentSelect"
-      )
+      .getElementById("departmentSelect")
       .value;
-
 
   const activitySelect =
     document
-      .getElementById(
-        "activitySelect"
-      );
-
+      .getElementById("activitySelect");
 
   activitySelect.innerHTML =
     '<option value="">Pilih Sub Activity</option>';
-
 
   if (!department) {
 
@@ -780,54 +541,41 @@ function loadSubActivities() {
     return;
   }
 
-
   const list =
     subActivities[department] || [];
 
+  list.forEach(function(activity) {
 
-  list.forEach(
-    function(activity) {
+    const option =
+      document.createElement("option");
 
-      const option =
-        document.createElement(
-          "option"
-        );
+    option.value =
+      activity;
 
-      option.value =
-        activity;
+    option.textContent =
+      activity;
 
-      option.textContent =
-        activity;
+    activitySelect.appendChild(option);
 
-      activitySelect.appendChild(
-        option
-      );
-    }
-  );
-
+  });
 
   updateDisplay();
 }
 
 
-/* ==================================================
-   UPDATE DISPLAY
-   ================================================== */
+/* ==========================================
+   DISPLAY
+   ========================================== */
 
 document
-  .getElementById(
-    "activitySelect"
-  )
+  .getElementById("activitySelect")
   .addEventListener(
     "change",
     updateDisplay
   );
 
-
 document
-  .getElementById(
-    "actionSelect"
-  )
+  .getElementById("actionSelect")
   .addEventListener(
     "change",
     updateDisplay
@@ -836,107 +584,70 @@ document
 
 function updateDisplay() {
 
-
   const department =
     document
-      .getElementById(
-        "departmentSelect"
-      )
+      .getElementById("departmentSelect")
       .value;
-
 
   const activity =
     document
-      .getElementById(
-        "activitySelect"
-      )
+      .getElementById("activitySelect")
       .value;
-
 
   const action =
     document
-      .getElementById(
-        "actionSelect"
-      )
+      .getElementById("actionSelect")
       .value;
 
-
   document
-    .getElementById(
-      "activity"
-    )
+    .getElementById("activity")
     .innerText =
       department || "-";
 
-
   document
-    .getElementById(
-      "subActivity"
-    )
+    .getElementById("subActivity")
     .innerText =
       activity || "-";
 
-
   document
-    .getElementById(
-      "action"
-    )
+    .getElementById("action")
     .innerText =
       action || "-";
 }
 
 
-/* ==================================================
+/* ==========================================
    START SCANNER
-   ================================================== */
+   ========================================== */
 
 function startScanner() {
 
-
   const operator =
     document
-      .getElementById(
-        "operator"
-      )
+      .getElementById("operator")
       .value
       .trim();
 
-
   const customerID =
     document
-      .getElementById(
-        "customerID"
-      )
+      .getElementById("customerID")
       .value;
-
 
   const department =
     document
-      .getElementById(
-        "departmentSelect"
-      )
+      .getElementById("departmentSelect")
       .value;
-
 
   const activity =
     document
-      .getElementById(
-        "activitySelect"
-      )
+      .getElementById("activitySelect")
       .value;
-
 
   const action =
     document
-      .getElementById(
-        "actionSelect"
-      )
+      .getElementById("actionSelect")
       .value;
 
-
-  /* =========================
-     VALIDASI
-     ========================= */
 
   if (!operator) {
 
@@ -992,12 +703,9 @@ function startScanner() {
 
     const quantity =
       document
-        .getElementById(
-          "quantity"
-        )
+        .getElementById("quantity")
         .value
         .trim();
-
 
     if (quantity === "") {
 
@@ -1010,10 +718,7 @@ function startScanner() {
   }
 
 
-  if (scannerRunning) {
-
-    return;
-  }
+  if (scannerRunning) return;
 
 
   currentDepartment =
@@ -1030,269 +735,181 @@ function startScanner() {
 
 
   document
-    .getElementById(
-      "status"
-    )
+    .getElementById("status")
     .className =
       "status";
 
-
   document
-    .getElementById(
-      "status"
-    )
+    .getElementById("status")
     .innerHTML =
       "📷 Membuka kamera...";
 
 
   scanner =
-    new Html5Qrcode(
-      "reader"
-    );
+    new Html5Qrcode("reader");
 
 
-  scanner
-    .start(
+  scanner.start(
 
-      {
-        facingMode:
-          "environment"
-      },
+    {
+      facingMode: "environment"
+    },
 
-      {
-        fps: 10,
+    {
+      fps: 10,
 
-        qrbox: {
-          width: 250,
-          height: 250
-        }
-      },
-
-      function(decodedText) {
-
-        qrSuccess(
-          decodedText
-        );
-      },
-
-      function(errorMessage) {}
-
-    )
-
-    .then(
-      function() {
-
-        scannerRunning =
-          true;
-
-
-        document
-          .getElementById(
-            "scanButton"
-          )
-          .style
-          .display =
-            "none";
-
-
-        document
-          .getElementById(
-            "stopButton"
-          )
-          .style
-          .display =
-            "block";
-
-
-        document
-          .getElementById(
-            "status"
-          )
-          .innerHTML =
-
-          "📷 <b>Kamera aktif</b><br>" +
-
-          "Scan QR: " +
-
-          currentActivity;
+      qrbox: {
+        width: 250,
+        height: 250
       }
-    )
+    },
 
-    .catch(
-      function(error) {
+    function(decodedText) {
 
-        console.log(
-          error
-        );
+      qrSuccess(decodedText);
 
+    },
 
-        scannerRunning =
-          false;
+    function(errorMessage) {}
 
+  )
 
-        document
-          .getElementById(
-            "status"
-          )
-          .className =
-            "status warning";
+  .then(function() {
 
+    scannerRunning =
+      true;
 
-        document
-          .getElementById(
-            "status"
-          )
-          .innerHTML =
+    document
+      .getElementById("scanButton")
+      .style.display =
+        "none";
 
-          "❌ Kamera tidak dapat dibuka.<br>" +
+    document
+      .getElementById("stopButton")
+      .style.display =
+        "block";
 
-          "Pastikan website menggunakan HTTPS.";
-      }
-    );
+    document
+      .getElementById("status")
+      .innerHTML =
+
+      "📷 <b>Kamera aktif</b><br>" +
+
+      "Scan QR " +
+
+      currentDepartment;
+
+  })
+
+  .catch(function(error) {
+
+    console.log(error);
+
+    scannerRunning =
+      false;
+
+    document
+      .getElementById("status")
+      .className =
+        "status warning";
+
+    document
+      .getElementById("status")
+      .innerHTML =
+
+      "❌ Kamera tidak dapat dibuka.<br>" +
+
+      "Pastikan website menggunakan HTTPS.";
+
+  });
+
 }
 
 
-/* ==================================================
+/* ==========================================
    QR SUCCESS
-   ================================================== */
+   ========================================== */
 
-function qrSuccess(
-  qrData
-) {
+function qrSuccess(qrData) {
 
+  if (!scannerRunning) return;
 
-  if (!scannerRunning) {
-
-    return;
-  }
-
-
-  // Hentikan callback QR berulang
   scannerRunning =
     false;
 
 
   if (scanner) {
 
-    scanner
-      .stop()
+    scanner.stop()
 
-      .then(
-        function() {
+      .then(function() {
 
-          scanner.clear();
+        scanner.clear();
 
-          showScanButton();
+        showScanButton();
 
-          processQR(
-            qrData
-          );
-        }
-      )
+        processQR(qrData);
 
-      .catch(
-        function() {
+      })
 
-          scanner.clear();
+      .catch(function() {
 
-          showScanButton();
+        scanner.clear();
 
-          processQR(
-            qrData
-          );
-        }
-      );
+        showScanButton();
+
+        processQR(qrData);
+
+      });
 
   } else {
 
     showScanButton();
 
-    processQR(
-      qrData
-    );
+    processQR(qrData);
+
   }
 }
 
 
-/* ==================================================
+/* ==========================================
    VALIDASI QR
-   ================================================== */
+   ========================================== */
 
-function processQR(
-  qrData
-) {
-
+function processQR(qrData) {
 
   /*
-    Format QR:
+    QR SEKARANG HANYA BERISI:
 
-    ACTIVITY|SUB ACTIVITY
-
-    Contoh:
-
-    INBOUND|PREPARATION
-
-    AUGER|MOVING BOX
+    INBOUND
+    MOVEMENT
+    OUTBOUND
+    AUGER
+    SLICING
+    REBOX
   */
-
-
-  const parts =
-    String(qrData)
-      .trim()
-      .split("|");
-
-
-  if (parts.length < 2) {
-
-    document
-      .getElementById(
-        "status"
-      )
-      .className =
-        "status warning";
-
-
-    document
-      .getElementById(
-        "status"
-      )
-      .innerHTML =
-
-      "⚠️ QR tidak valid.<br>" +
-
-      "QR harus berisi Activity dan Sub Activity.";
-
-    return;
-  }
-
-
-  const qrDepartment =
-    parts[0]
-      .trim();
-
 
   const qrActivity =
-    parts
-      .slice(1)
-      .join("|")
+    String(qrData)
       .trim();
 
 
   /*
-    Bandingkan Activity
+    Cocokkan QR dengan
+    Activity yang dipilih.
   */
 
   if (
 
-    qrDepartment
-      .toLowerCase() !==
-    currentDepartment
-      .toLowerCase()
+    qrActivity.toLowerCase() !==
+    currentDepartment.toLowerCase()
 
   ) {
 
     showQRWarning(
-      "Activity QR tidak sesuai."
+
+      "QR tidak sesuai dengan Activity yang dipilih."
+
     );
 
     return;
@@ -1300,47 +917,19 @@ function processQR(
 
 
   /*
-    Bandingkan Sub Activity
-  */
-
-  if (
-
-    qrActivity
-      .toLowerCase() !==
-    currentActivity
-      .toLowerCase()
-
-  ) {
-
-    showQRWarning(
-
-      "QR bukan untuk Sub Activity " +
-
-      currentActivity +
-
-      "."
-    );
-
-    return;
-  }
-
-
-  /*
-    QR valid
+    QR valid.
+    Sub Activity diambil dari
+    dropdown website.
   */
 
   document
-    .getElementById(
-      "status"
-    )
+    .getElementById("status")
     .className =
       "status";
 
 
   document
-    .getElementById(
-      "status"
-    )
+    .getElementById("status")
     .innerHTML =
 
       "⏳ Memproses " +
@@ -1354,87 +943,63 @@ function processQR(
 }
 
 
-/* ==================================================
+/* ==========================================
    QR WARNING
-   ================================================== */
+   ========================================== */
 
-function showQRWarning(
-  message
-) {
+function showQRWarning(message) {
 
   document
-    .getElementById(
-      "status"
-    )
+    .getElementById("status")
     .className =
       "status warning";
 
 
   document
-    .getElementById(
-      "status"
-    )
+    .getElementById("status")
     .innerHTML =
-
-      "⚠️ " +
-      message;
+      "⚠️ " + message;
 }
 
 
-/* ==================================================
-   SHOW SCAN BUTTON
-   ================================================== */
+/* ==========================================
+   SCAN BUTTON
+   ========================================== */
 
 function showScanButton() {
 
   document
-    .getElementById(
-      "scanButton"
-    )
-    .style
-    .display =
+    .getElementById("scanButton")
+    .style.display =
       "block";
 
-
   document
-    .getElementById(
-      "stopButton"
-    )
-    .style
-    .display =
+    .getElementById("stopButton")
+    .style.display =
       "none";
 }
 
 
-/* ==================================================
-   SEND TO GOOGLE SHEET
-   ================================================== */
+/* ==========================================
+   SEND DATA
+   ========================================== */
 
 function sendToGoogleSheet() {
 
-
   const operator =
     document
-      .getElementById(
-        "operator"
-      )
+      .getElementById("operator")
       .value
       .trim();
 
-
   const customerID =
     document
-      .getElementById(
-        "customerID"
-      )
+      .getElementById("customerID")
       .value;
-
 
   const quantity =
     document
-      .getElementById(
-        "quantity"
-      )
+      .getElementById("quantity")
       .value;
 
 
@@ -1447,59 +1012,47 @@ function sendToGoogleSheet() {
     function(result) {
 
 
-      delete window[
-        callbackName
-      ];
+      delete window[callbackName];
 
 
       const script =
         document
-          .getElementById(
-            callbackName
-          );
+          .getElementById(callbackName);
 
 
       if (script) {
 
         script.remove();
+
       }
 
 
-      /* =========================
-         START BERHASIL
-         ========================= */
+      /* ==========================
+         START
+         ========================== */
 
       if (
 
         result.success &&
 
-        result.type ===
-          "START"
+        result.type === "START"
 
       ) {
 
-
         document
-          .getElementById(
-            "transaction"
-          )
+          .getElementById("transaction")
           .innerText =
-
-          result.transactionID;
+            result.transactionID;
 
 
         document
-          .getElementById(
-            "status"
-          )
+          .getElementById("status")
           .className =
             "status success";
 
 
         document
-          .getElementById(
-            "status"
-          )
+          .getElementById("status")
           .innerHTML =
 
           "🟢 <b>START BERHASIL</b><br>" +
@@ -1514,46 +1067,36 @@ function sendToGoogleSheet() {
 
           "Status: Running";
 
-
         return;
       }
 
 
-      /* =========================
-         END BERHASIL
-         ========================= */
+      /* ==========================
+         END
+         ========================== */
 
       if (
 
         result.success &&
 
-        result.type ===
-          "FINISH"
+        result.type === "FINISH"
 
       ) {
 
-
         document
-          .getElementById(
-            "transaction"
-          )
+          .getElementById("transaction")
           .innerText =
-
-          result.transactionID;
+            result.transactionID;
 
 
         document
-          .getElementById(
-            "status"
-          )
+          .getElementById("status")
           .className =
             "status success";
 
 
         document
-          .getElementById(
-            "status"
-          )
+          .getElementById("status")
           .innerHTML =
 
           "✅ <b>SELESAI</b><br>" +
@@ -1578,34 +1121,29 @@ function sendToGoogleSheet() {
 
           " menit";
 
-
         return;
       }
 
 
-      /* =========================
-         SUDAH RUNNING
-         ========================= */
+      /* ==========================
+         ALREADY RUNNING
+         ========================== */
 
       if (
 
         result.type ===
-          "ALREADY_RUNNING"
+        "ALREADY_RUNNING"
 
       ) {
 
         document
-          .getElementById(
-            "status"
-          )
+          .getElementById("status")
           .className =
             "status warning";
 
 
         document
-          .getElementById(
-            "status"
-          )
+          .getElementById("status")
           .innerHTML =
 
           "⚠️ <b>Masih Running</b><br>" +
@@ -1616,29 +1154,25 @@ function sendToGoogleSheet() {
       }
 
 
-      /* =========================
-         QUANTITY
-         ========================= */
+      /* ==========================
+         NEED QUANTITY
+         ========================== */
 
       if (
 
         result.type ===
-          "NEED_QUANTITY"
+        "NEED_QUANTITY"
 
       ) {
 
         document
-          .getElementById(
-            "status"
-          )
+          .getElementById("status")
           .className =
             "status warning";
 
 
         document
-          .getElementById(
-            "status"
-          )
+          .getElementById("status")
           .innerHTML =
 
           "⚠️ Isi Quantity terlebih dahulu.";
@@ -1647,29 +1181,25 @@ function sendToGoogleSheet() {
       }
 
 
-      /* =========================
+      /* ==========================
          INVALID QUANTITY
-         ========================= */
+         ========================== */
 
       if (
 
         result.type ===
-          "INVALID_QUANTITY"
+        "INVALID_QUANTITY"
 
       ) {
 
         document
-          .getElementById(
-            "status"
-          )
+          .getElementById("status")
           .className =
             "status warning";
 
 
         document
-          .getElementById(
-            "status"
-          )
+          .getElementById("status")
           .innerHTML =
 
           "⚠️ Quantity harus berupa angka.";
@@ -1678,29 +1208,25 @@ function sendToGoogleSheet() {
       }
 
 
-      /* =========================
+      /* ==========================
          NO RUNNING
-         ========================= */
+         ========================== */
 
       if (
 
         result.type ===
-          "NO_RUNNING"
+        "NO_RUNNING"
 
       ) {
 
         document
-          .getElementById(
-            "status"
-          )
+          .getElementById("status")
           .className =
             "status warning";
 
 
         document
-          .getElementById(
-            "status"
-          )
+          .getElementById("status")
           .innerHTML =
 
           "⚠️ Tidak ditemukan data Running untuk proses ini.";
@@ -1709,37 +1235,33 @@ function sendToGoogleSheet() {
       }
 
 
-      /* =========================
+      /* ==========================
          ERROR
-         ========================= */
+         ========================== */
 
       document
-        .getElementById(
-          "status"
-        )
+        .getElementById("status")
         .className =
           "status warning";
 
 
       document
-        .getElementById(
-          "status"
-        )
+        .getElementById("status")
         .innerHTML =
 
         "❌ " +
 
         (
           result.message ||
-
           "Data gagal diproses."
         );
+
     };
 
 
-  /* ==================================================
-     PARAMETER KE APPS SCRIPT
-     ================================================== */
+  /* ==========================================
+     KIRIM DATA KE GOOGLE APPS SCRIPT
+     ========================================== */
 
   const params =
     new URLSearchParams({
@@ -1767,13 +1289,12 @@ function sendToGoogleSheet() {
 
       action:
         currentAction
+
     });
 
 
   const script =
-    document.createElement(
-      "script"
-    );
+    document.createElement("script");
 
 
   script.id =
@@ -1788,50 +1309,46 @@ function sendToGoogleSheet() {
 
   document
     .body
-    .appendChild(
-      script
-    );
+    .appendChild(script);
 }
 
 
-/* ==================================================
-   STOP SCANNER
-   ================================================== */
+/* ==========================================
+   STOP CAMERA
+   ========================================== */
 
 function stopScanner() {
-
 
   if (
     scanner &&
     scannerRunning
   ) {
 
-
     scanner
       .stop()
 
-      .then(
-        function() {
+      .then(function() {
 
-          scanner.clear();
+        scanner.clear();
 
-          scannerRunning =
-            false;
+        scannerRunning =
+          false;
 
-          showScanButton();
-        }
-      )
+        showScanButton();
 
-      .catch(
-        function() {
+      })
 
-          scannerRunning =
-            false;
+      .catch(function() {
 
-          showScanButton();
-        }
-      );
+        scannerRunning =
+          false;
+
+        showScanButton();
+
+      });
+
   }
+
 }
 
 </script>
