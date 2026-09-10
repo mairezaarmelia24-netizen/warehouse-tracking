@@ -3,13 +3,10 @@
 
 <head>
   <meta charset="UTF-8">
-
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Warehouse Activity Tracking</title>
 
-  <!-- QR SCANNER -->
   <script src="https://unpkg.com/html5-qrcode"></script>
 
   <style>
@@ -47,12 +44,14 @@
       margin-bottom: 6px;
     }
 
-    input {
+    input,
+    select {
       width: 100%;
       padding: 13px;
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 16px;
+      background: white;
     }
 
     .info {
@@ -121,7 +120,6 @@
 
 </head>
 
-
 <body>
 
 <div class="container">
@@ -129,7 +127,7 @@
   <h2>🏭 Warehouse Tracking</h2>
 
 
-  <!-- OPERATOR -->
+  <!-- NAMA OPERATOR -->
 
   <label>Nama Operator</label>
 
@@ -139,14 +137,66 @@
     placeholder="Masukkan nama operator">
 
 
-  <!-- CUSTOMER -->
+  <!-- CUSTOMER ID -->
 
   <label>Customer ID</label>
 
-  <input
-    id="customerID"
-    type="text"
-    placeholder="Masukkan Customer ID">
+  <select id="customerID">
+
+    <option value="">
+      Pilih Customer ID
+    </option>
+
+    <option value="PMID">
+      PMID
+    </option>
+
+    <option value="HMS">
+      HMS
+    </option>
+
+    <option value="CLOVE">
+      CLOVE
+    </option>
+
+  </select>
+
+
+  <!-- ACTIVITY -->
+
+  <label>Activity</label>
+
+  <select id="activitySelect">
+
+    <option value="">
+      Pilih Activity
+    </option>
+
+    <option value="Inbound">
+      Inbound
+    </option>
+
+    <option value="Inventory">
+      Inventory
+    </option>
+
+    <option value="Outbound">
+      Outbound
+    </option>
+
+    <option value="Auger">
+      Auger
+    </option>
+
+    <option value="Slicing">
+      Slicing
+    </option>
+
+    <option value="Rebox">
+      Rebox
+    </option>
+
+  </select>
 
 
   <!-- TRANSACTION -->
@@ -162,17 +212,14 @@
   </div>
 
 
-  <!-- ACTIVITY -->
+  <!-- ACTIVITY RESULT -->
 
   <div class="activity">
 
-    <b>Department:</b>
-    <span id="department">-</span>
-
-    <br>
-
     <b>Activity:</b>
-    <span id="activity">-</span>
+    <span id="activity">
+      -
+    </span>
 
   </div>
 
@@ -184,7 +231,7 @@
   <input
     id="quantity"
     type="number"
-    placeholder="Isi setelah pekerjaan selesai">
+    placeholder="Isi Quantity">
 
 
   <!-- SCAN -->
@@ -220,8 +267,8 @@
     id="status"
     class="status">
 
-    Isi Nama Operator dan Customer ID,
-    lalu tekan SCAN QR.
+    Isi data operator, pilih Customer ID
+    dan Activity, lalu tekan SCAN QR.
 
   </div>
 
@@ -232,7 +279,7 @@
 
 
 // =====================================================
-// URL GOOGLE APPS SCRIPT
+// GOOGLE APPS SCRIPT
 // =====================================================
 
 const APPS_SCRIPT_URL =
@@ -249,8 +296,6 @@ let scannerRunning = false;
 
 let currentTransaction = "";
 
-let currentDepartment = "";
-
 let currentActivity = "";
 
 
@@ -266,7 +311,11 @@ function startScanner() {
 
   const customerID =
     document.getElementById("customerID")
-      .value.trim();
+      .value;
+
+  const activity =
+    document.getElementById("activitySelect")
+      .value;
 
 
   // CHECK OPERATOR
@@ -283,7 +332,17 @@ function startScanner() {
 
   if (!customerID) {
 
-    alert("Isi Customer ID terlebih dahulu.");
+    alert("Pilih Customer ID terlebih dahulu.");
+
+    return;
+  }
+
+
+  // CHECK ACTIVITY
+
+  if (!activity) {
+
+    alert("Pilih Activity terlebih dahulu.");
 
     return;
   }
@@ -292,9 +351,23 @@ function startScanner() {
   if (scannerRunning) return;
 
 
+  // SIMPAN ACTIVITY YANG DIPILIH
+
+  currentActivity = activity;
+
+
+  // TAMPILKAN ACTIVITY
+
+  document.getElementById("activity")
+    .innerText = activity;
+
+
   scanner =
     new Html5Qrcode("reader");
 
+
+  document.getElementById("status")
+    .className = "status";
 
   document.getElementById("status")
     .innerHTML =
@@ -325,8 +398,7 @@ function startScanner() {
 
     function(errorMessage) {
 
-      // Jangan tampilkan error
-      // setiap frame kamera
+      // Abaikan error frame kamera
 
     }
 
@@ -378,48 +450,43 @@ function qrSuccess(qrData) {
   stopScanner();
 
 
+  /*
+    QR UTAMA:
+    INB-001
+
+    Sistem juga masih bisa membaca QR lama:
+    INB-001|INBOUND|Unloading
+  */
+
+
   const parts =
     qrData.split("|");
-
-
-  // FORMAT QR HARUS:
-
-  // INB-001|INBOUND|Unloading
-
-
-  if (parts.length < 3) {
-
-    document.getElementById("status")
-      .className =
-      "status warning";
-
-    document.getElementById("status")
-      .innerHTML =
-      "❌ Format QR tidak sesuai.";
-
-    return;
-  }
 
 
   currentTransaction =
     parts[0].trim();
 
-  currentDepartment =
-    parts[1].trim();
 
-  currentActivity =
-    parts[2].trim();
+  // Jika QR lama memiliki activity,
+  // gunakan data activity dari QR.
+  // Jika tidak, gunakan activity dari dropdown.
+
+  if (parts.length >= 3) {
+
+    currentActivity =
+      parts[2].trim();
+
+  }
 
 
-  // TAMPILKAN HASIL SCAN
+  // TAMPILKAN TRANSACTION
 
   document.getElementById("transaction")
     .innerText =
     currentTransaction;
 
-  document.getElementById("department")
-    .innerText =
-    currentDepartment;
+
+  // TAMPILKAN ACTIVITY
 
   document.getElementById("activity")
     .innerText =
@@ -434,7 +501,7 @@ function qrSuccess(qrData) {
 
   const customerID =
     document.getElementById("customerID")
-      .value.trim();
+      .value;
 
   const quantity =
     document.getElementById("quantity")
@@ -442,8 +509,7 @@ function qrSuccess(qrData) {
 
 
   document.getElementById("status")
-    .className =
-    "status";
+    .className = "status";
 
   document.getElementById("status")
     .innerHTML =
@@ -451,7 +517,7 @@ function qrSuccess(qrData) {
 
 
   // ===================================================
-  // KIRIM KE GOOGLE APPS SCRIPT
+  // KIRIM KE GOOGLE SHEET
   // ===================================================
 
   sendToGoogleSheet({
@@ -466,7 +532,7 @@ function qrSuccess(qrData) {
       currentTransaction,
 
     department:
-      currentDepartment,
+      currentActivity,
 
     activity:
       currentActivity,
@@ -480,7 +546,7 @@ function qrSuccess(qrData) {
 
 
 // =====================================================
-// KIRIM DATA KE APPS SCRIPT
+// SEND TO GOOGLE APPS SCRIPT
 // =====================================================
 
 function sendToGoogleSheet(data) {
@@ -493,8 +559,6 @@ function sendToGoogleSheet(data) {
   window[callbackName] =
     function(result) {
 
-      // Hapus callback
-
       delete window[callbackName];
 
 
@@ -502,13 +566,15 @@ function sendToGoogleSheet(data) {
         document.getElementById(callbackName);
 
       if (script) {
+
         script.remove();
+
       }
 
 
-      // ================================================
+      // =================================================
       // START
-      // ================================================
+      // =================================================
 
       if (
         result.success &&
@@ -530,9 +596,9 @@ function sendToGoogleSheet(data) {
       }
 
 
-      // ================================================
+      // =================================================
       // FINISH
-      // ================================================
+      // =================================================
 
       if (
         result.success &&
@@ -556,9 +622,9 @@ function sendToGoogleSheet(data) {
       }
 
 
-      // ================================================
+      // =================================================
       // NEED QUANTITY
-      // ================================================
+      // =================================================
 
       if (
         result.type === "NEED_QUANTITY"
@@ -576,9 +642,9 @@ function sendToGoogleSheet(data) {
       }
 
 
-      // ================================================
+      // =================================================
       // ERROR
-      // ================================================
+      // =================================================
 
       document.getElementById("status")
         .className =
@@ -587,44 +653,51 @@ function sendToGoogleSheet(data) {
       document.getElementById("status")
         .innerHTML =
         "❌ " +
-        (result.message ||
-        "Data gagal diproses.");
+        (
+          result.message ||
+          "Data gagal diproses."
+        );
 
     };
 
 
-  // Buat URL API
+  // =====================================================
+  // API PARAMETERS
+  // =====================================================
 
-  const params = new URLSearchParams({
+  const params =
+    new URLSearchParams({
 
-    api:
-      "processScan",
+      api:
+        "processScan",
 
-    callback:
-      callbackName,
+      callback:
+        callbackName,
 
-    operator:
-      data.operator,
+      operator:
+        data.operator,
 
-    customerID:
-      data.customerID,
+      customerID:
+        data.customerID,
 
-    transactionID:
-      data.transactionID,
+      transactionID:
+        data.transactionID,
 
-    department:
-      data.department,
+      department:
+        data.department,
 
-    activity:
-      data.activity,
+      activity:
+        data.activity,
 
-    quantity:
-      data.quantity
+      quantity:
+        data.quantity
 
-  });
+    });
 
 
-  // Buat script JSONP
+  // =====================================================
+  // JSONP
+  // =====================================================
 
   const script =
     document.createElement("script");
