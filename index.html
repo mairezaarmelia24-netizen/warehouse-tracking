@@ -48,13 +48,20 @@ label {
 }
 
 input,
-select {
+select,
+textarea {
   width: 100%;
   padding: 13px;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 16px;
   background: white;
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+  font-family: Arial, sans-serif;
 }
 
 .info {
@@ -134,22 +141,14 @@ select {
 
 <body>
 
-
 <div class="container">
 
-
-<h2>
-🏭 Warehouse Activity Tracking
-</h2>
+<h2>🏭 Warehouse Activity Tracking</h2>
 
 
-<!-- =========================
-     OPERATOR
-     ========================= -->
+<!-- OPERATOR -->
 
-<label>
-Nama Operator
-</label>
+<label>Nama Operator</label>
 
 <input
   id="operator"
@@ -158,13 +157,9 @@ Nama Operator
 >
 
 
-<!-- =========================
-     CUSTOMER
-     ========================= -->
+<!-- CUSTOMER -->
 
-<label>
-Customer ID
-</label>
+<label>Customer ID</label>
 
 <select id="customerID">
 
@@ -187,13 +182,9 @@ Customer ID
 </select>
 
 
-<!-- =========================
-     ACTIVITY
-     ========================= -->
+<!-- ACTIVITY -->
 
-<label>
-Activity
-</label>
+<label>Activity</label>
 
 <select
   id="departmentSelect"
@@ -231,13 +222,9 @@ Activity
 </select>
 
 
-<!-- =========================
-     SUB ACTIVITY
-     ========================= -->
+<!-- SUB ACTIVITY -->
 
-<label>
-Sub Activity
-</label>
+<label>Sub Activity</label>
 
 <select id="activitySelect">
 
@@ -252,13 +239,23 @@ Sub Activity
 </div>
 
 
-<!-- =========================
-     ACTION
-     ========================= -->
+<!-- DESCRIPTION -->
 
-<label>
-Action
-</label>
+<label>Penjelasan Sub Activity</label>
+
+<textarea
+  id="description"
+  placeholder="Ketik penjelasan jika diperlukan..."
+></textarea>
+
+<div class="smallText">
+  Optional — boleh dikosongkan.
+</div>
+
+
+<!-- ACTION -->
+
+<label>Action</label>
 
 <select id="actionSelect">
 
@@ -277,15 +274,11 @@ Action
 </select>
 
 
-<!-- =========================
-     TRANSACTION ID
-     ========================= -->
+<!-- TRANSACTION ID -->
 
 <div class="info">
 
-  <b>
-    Transaction ID
-  </b>
+  <b>Transaction ID</b>
 
   <br>
 
@@ -296,50 +289,29 @@ Action
 </div>
 
 
-<!-- =========================
-     SELECTED DATA
-     ========================= -->
+<!-- SELECTED DATA -->
 
 <div class="activityBox">
 
-  <b>
-    Activity:
-  </b>
-
-  <span id="activity">
-    -
-  </span>
+  <b>Activity:</b>
+  <span id="activity">-</span>
 
   <br>
 
-  <b>
-    Sub Activity:
-  </b>
-
-  <span id="subActivity">
-    -
-  </span>
+  <b>Sub Activity:</b>
+  <span id="subActivity">-</span>
 
   <br>
 
-  <b>
-    Action:
-  </b>
-
-  <span id="action">
-    -
-  </span>
+  <b>Action:</b>
+  <span id="action">-</span>
 
 </div>
 
 
-<!-- =========================
-     QUANTITY
-     ========================= -->
+<!-- QUANTITY -->
 
-<label>
-Quantity
-</label>
+<label>Quantity</label>
 
 <input
   id="quantity"
@@ -349,9 +321,7 @@ Quantity
 >
 
 
-<!-- =========================
-     SCAN QR
-     ========================= -->
+<!-- SCAN -->
 
 <button
   id="scanButton"
@@ -361,7 +331,6 @@ Quantity
   📷 SCAN QR
 </button>
 
-
 <button
   id="stopButton"
   class="stopButton"
@@ -370,13 +339,10 @@ Quantity
   Tutup Kamera
 </button>
 
-
 <div id="reader"></div>
 
 
-<!-- =========================
-     STATUS
-     ========================= -->
+<!-- STATUS -->
 
 <div
   id="status"
@@ -385,7 +351,6 @@ Quantity
   Pilih Activity, Sub Activity,
   dan Action lalu scan QR.
 </div>
-
 
 </div>
 
@@ -418,11 +383,6 @@ let currentAction = "";
 
 const subActivities = {
 
-
-  /* ================================================
-     INBOUND
-     ================================================ */
-
   Inbound: [
 
     "Preparation",
@@ -441,10 +401,6 @@ const subActivities = {
 
   ],
 
-
-  /* ================================================
-     MOVEMENT
-     ================================================ */
 
   Movement: [
 
@@ -466,10 +422,6 @@ const subActivities = {
 
   ],
 
-
-  /* ================================================
-     OUTBOUND
-     ================================================ */
 
   Outbound: [
 
@@ -504,10 +456,6 @@ const subActivities = {
   ],
 
 
-  /* ================================================
-     AUGER
-     ================================================ */
-
   Auger: [
 
     "Moving Box",
@@ -522,10 +470,6 @@ const subActivities = {
 
   ],
 
-
-  /* ================================================
-     SLICING
-     ================================================ */
 
   Slicing: [
 
@@ -545,10 +489,6 @@ const subActivities = {
 
   ],
 
-
-  /* ================================================
-     REBOX
-     ================================================ */
 
   Rebox: [
 
@@ -576,15 +516,12 @@ function loadSubActivities() {
       .getElementById("departmentSelect")
       .value;
 
-
   const activitySelect =
     document
       .getElementById("activitySelect");
 
-
   activitySelect.innerHTML =
     '<option value="">Pilih Sub Activity</option>';
-
 
   if (!department) {
 
@@ -593,31 +530,23 @@ function loadSubActivities() {
     return;
   }
 
-
   const list =
     subActivities[department] || [];
-
 
   list.forEach(function(activity) {
 
     const option =
       document.createElement("option");
 
-
     option.value =
       activity;
-
 
     option.textContent =
       activity;
 
-
-    activitySelect.appendChild(
-      option
-    );
+    activitySelect.appendChild(option);
 
   });
-
 
   updateDisplay();
 }
@@ -634,7 +563,6 @@ document
     updateDisplay
   );
 
-
 document
   .getElementById("actionSelect")
   .addEventListener(
@@ -650,30 +578,25 @@ function updateDisplay() {
       .getElementById("departmentSelect")
       .value;
 
-
   const activity =
     document
       .getElementById("activitySelect")
       .value;
-
 
   const action =
     document
       .getElementById("actionSelect")
       .value;
 
-
   document
     .getElementById("activity")
     .innerText =
       department || "-";
 
-
   document
     .getElementById("subActivity")
     .innerText =
       activity || "-";
-
 
   document
     .getElementById("action")
@@ -694,34 +617,26 @@ function startScanner() {
       .value
       .trim();
 
-
   const customerID =
     document
       .getElementById("customerID")
       .value;
-
 
   const department =
     document
       .getElementById("departmentSelect")
       .value;
 
-
   const activity =
     document
       .getElementById("activitySelect")
       .value;
-
 
   const action =
     document
       .getElementById("actionSelect")
       .value;
 
-
-  /* ================================================
-     VALIDATION
-     ================================================ */
 
   if (!operator) {
 
@@ -781,7 +696,6 @@ function startScanner() {
         .value
         .trim();
 
-
     if (quantity === "") {
 
       alert(
@@ -793,19 +707,14 @@ function startScanner() {
   }
 
 
-  if (scannerRunning) {
-
-    return;
-  }
+  if (scannerRunning) return;
 
 
   currentDepartment =
     department;
 
-
   currentActivity =
     activity;
-
 
   currentAction =
     action;
@@ -818,7 +727,6 @@ function startScanner() {
     .getElementById("status")
     .className =
       "status";
-
 
   document
     .getElementById("status")
@@ -843,7 +751,6 @@ function startScanner() {
         width: 250,
         height: 250
       }
-
     },
 
     function(decodedText) {
@@ -856,59 +763,46 @@ function startScanner() {
 
   )
 
-
   .then(function() {
 
     scannerRunning =
       true;
-
 
     document
       .getElementById("scanButton")
       .style.display =
         "none";
 
-
     document
       .getElementById("stopButton")
       .style.display =
         "block";
 
-
     document
       .getElementById("status")
       .innerHTML =
-
       "📷 <b>Kamera aktif</b><br>" +
-
       "Scan QR " +
-
       currentDepartment;
 
   })
-
 
   .catch(function(error) {
 
     console.log(error);
 
-
     scannerRunning =
       false;
-
 
     document
       .getElementById("status")
       .className =
         "status warning";
 
-
     document
       .getElementById("status")
       .innerHTML =
-
       "❌ Kamera tidak dapat dibuka.<br>" +
-
       "Pastikan website menggunakan HTTPS.";
 
   });
@@ -922,11 +816,7 @@ function startScanner() {
 
 function qrSuccess(qrData) {
 
-  if (!scannerRunning) {
-
-    return;
-  }
-
+  if (!scannerRunning) return;
 
   scannerRunning =
     false;
@@ -956,9 +846,7 @@ function qrSuccess(qrData) {
 
       });
 
-  }
-
-  else {
+  } else {
 
     showScanButton();
 
@@ -975,7 +863,7 @@ function qrSuccess(qrData) {
 function processQR(qrData) {
 
   /*
-    QR HANYA berisi Activity:
+    QR hanya berisi Activity:
 
     INBOUND
     MOVEMENT
@@ -985,16 +873,10 @@ function processQR(qrData) {
     REBOX
   */
 
-
   const qrActivity =
     String(qrData)
       .trim();
 
-
-  /*
-    Cocokkan QR dengan
-    Activity yang dipilih.
-  */
 
   if (
 
@@ -1011,27 +893,16 @@ function processQR(qrData) {
   }
 
 
-  /*
-    QR valid.
-
-    Sub Activity tetap menggunakan
-    pilihan dropdown.
-  */
-
   document
     .getElementById("status")
     .className =
       "status";
 
-
   document
     .getElementById("status")
     .innerHTML =
-
       "⏳ Memproses " +
-
       currentAction +
-
       "...";
 
 
@@ -1049,7 +920,6 @@ function showQRWarning(message) {
     .getElementById("status")
     .className =
       "status warning";
-
 
   document
     .getElementById("status")
@@ -1069,7 +939,6 @@ function showScanButton() {
     .style.display =
       "block";
 
-
   document
     .getElementById("stopButton")
     .style.display =
@@ -1078,7 +947,7 @@ function showScanButton() {
 
 
 /* ==================================================
-   SEND DATA TO GOOGLE APPS SCRIPT
+   SEND TO GOOGLE SHEET
    ================================================== */
 
 function sendToGoogleSheet() {
@@ -1089,12 +958,16 @@ function sendToGoogleSheet() {
       .value
       .trim();
 
-
   const customerID =
     document
       .getElementById("customerID")
       .value;
 
+  const description =
+    document
+      .getElementById("description")
+      .value
+      .trim();
 
   const quantity =
     document
@@ -1110,36 +983,26 @@ function sendToGoogleSheet() {
   window[callbackName] =
     function(result) {
 
-
-      delete window[
-        callbackName
-      ];
+      delete window[callbackName];
 
 
       const script =
         document
-          .getElementById(
-            callbackName
-          );
+          .getElementById(callbackName);
 
 
       if (script) {
-
         script.remove();
-
       }
 
 
-      /* =========================================
-         START BERHASIL
-         ========================================= */
+      /* ==========================================
+         START
+         ========================================== */
 
       if (
-
         result.success &&
-
         result.type === "START"
-
       ) {
 
         document
@@ -1157,34 +1020,24 @@ function sendToGoogleSheet() {
         document
           .getElementById("status")
           .innerHTML =
-
           "🟢 <b>START BERHASIL</b><br>" +
-
           currentDepartment +
-
           " → " +
-
           currentActivity +
-
           "<br><br>" +
-
           "Status: Running";
 
-
         return;
       }
 
 
-      /* =========================================
-         END BERHASIL
-         ========================================= */
+      /* ==========================================
+         END
+         ========================================== */
 
       if (
-
         result.success &&
-
         result.type === "FINISH"
-
       ) {
 
         document
@@ -1202,43 +1055,29 @@ function sendToGoogleSheet() {
         document
           .getElementById("status")
           .innerHTML =
-
           "✅ <b>SELESAI</b><br>" +
-
           currentDepartment +
-
           " → " +
-
           currentActivity +
-
           "<br>" +
-
           "Quantity: " +
-
           result.quantity +
-
           "<br>" +
-
           "Duration: " +
-
           result.duration +
-
           " menit";
-
 
         return;
       }
 
 
-      /* =========================================
+      /* ==========================================
          ALREADY RUNNING
-         ========================================= */
+         ========================================== */
 
       if (
-
         result.type ===
         "ALREADY_RUNNING"
-
       ) {
 
         document
@@ -1250,24 +1089,20 @@ function sendToGoogleSheet() {
         document
           .getElementById("status")
           .innerHTML =
-
           "⚠️ <b>Masih Running</b><br>" +
-
           "Silakan lakukan END terlebih dahulu.";
 
         return;
       }
 
 
-      /* =========================================
+      /* ==========================================
          NEED QUANTITY
-         ========================================= */
+         ========================================== */
 
       if (
-
         result.type ===
         "NEED_QUANTITY"
-
       ) {
 
         document
@@ -1279,22 +1114,19 @@ function sendToGoogleSheet() {
         document
           .getElementById("status")
           .innerHTML =
-
           "⚠️ Isi Quantity terlebih dahulu.";
 
         return;
       }
 
 
-      /* =========================================
+      /* ==========================================
          INVALID QUANTITY
-         ========================================= */
+         ========================================== */
 
       if (
-
         result.type ===
         "INVALID_QUANTITY"
-
       ) {
 
         document
@@ -1306,22 +1138,19 @@ function sendToGoogleSheet() {
         document
           .getElementById("status")
           .innerHTML =
-
           "⚠️ Quantity harus berupa angka.";
 
         return;
       }
 
 
-      /* =========================================
+      /* ==========================================
          NO RUNNING
-         ========================================= */
+         ========================================== */
 
       if (
-
         result.type ===
         "NO_RUNNING"
-
       ) {
 
         document
@@ -1333,16 +1162,15 @@ function sendToGoogleSheet() {
         document
           .getElementById("status")
           .innerHTML =
-
           "⚠️ Tidak ditemukan data Running untuk proses ini.";
 
         return;
       }
 
 
-      /* =========================================
+      /* ==========================================
          ERROR
-         ========================================= */
+         ========================================== */
 
       document
         .getElementById("status")
@@ -1353,9 +1181,7 @@ function sendToGoogleSheet() {
       document
         .getElementById("status")
         .innerHTML =
-
         "❌ " +
-
         (
           result.message ||
           "Data gagal diproses."
@@ -1364,9 +1190,9 @@ function sendToGoogleSheet() {
     };
 
 
-  /* =========================================
-     PARAMETER KE APPS SCRIPT
-     ========================================= */
+  /* ==========================================
+     SEND PARAMETERS
+     ========================================== */
 
   const params =
     new URLSearchParams({
@@ -1388,6 +1214,9 @@ function sendToGoogleSheet() {
 
       activity:
         currentActivity,
+
+      description:
+        description,
 
       quantity:
         quantity,
