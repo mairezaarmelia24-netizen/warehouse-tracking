@@ -146,7 +146,9 @@ textarea {
 <h2>🏭 Warehouse Activity Tracking</h2>
 
 
-<!-- OPERATOR -->
+<!-- ========================================
+     OPERATOR
+     ======================================== -->
 
 <label>Nama Operator</label>
 
@@ -157,7 +159,9 @@ textarea {
 >
 
 
-<!-- CUSTOMER -->
+<!-- ========================================
+     CUSTOMER ID
+     ======================================== -->
 
 <label>Customer ID</label>
 
@@ -182,7 +186,9 @@ textarea {
 </select>
 
 
-<!-- ACTIVITY -->
+<!-- ========================================
+     ACTIVITY
+     ======================================== -->
 
 <label>Activity</label>
 
@@ -222,7 +228,9 @@ textarea {
 </select>
 
 
-<!-- SUB ACTIVITY -->
+<!-- ========================================
+     SUB ACTIVITY
+     ======================================== -->
 
 <label>Sub Activity</label>
 
@@ -239,7 +247,9 @@ textarea {
 </div>
 
 
-<!-- DESCRIPTION -->
+<!-- ========================================
+     DESCRIPTION
+     ======================================== -->
 
 <label>Penjelasan Sub Activity</label>
 
@@ -253,7 +263,9 @@ textarea {
 </div>
 
 
-<!-- ACTION -->
+<!-- ========================================
+     ACTION
+     ======================================== -->
 
 <label>Action</label>
 
@@ -274,7 +286,9 @@ textarea {
 </select>
 
 
-<!-- TRANSACTION ID -->
+<!-- ========================================
+     TRANSACTION ID
+     ======================================== -->
 
 <div class="info">
 
@@ -289,7 +303,9 @@ textarea {
 </div>
 
 
-<!-- SELECTED DATA -->
+<!-- ========================================
+     SELECTED DATA
+     ======================================== -->
 
 <div class="activityBox">
 
@@ -309,7 +325,9 @@ textarea {
 </div>
 
 
-<!-- QUANTITY -->
+<!-- ========================================
+     QUANTITY
+     ======================================== -->
 
 <label>Quantity</label>
 
@@ -321,7 +339,9 @@ textarea {
 >
 
 
-<!-- SCAN -->
+<!-- ========================================
+     SCAN QR
+     ======================================== -->
 
 <button
   id="scanButton"
@@ -342,7 +362,9 @@ textarea {
 <div id="reader"></div>
 
 
-<!-- STATUS -->
+<!-- ========================================
+     STATUS
+     ======================================== -->
 
 <div
   id="status"
@@ -359,12 +381,16 @@ textarea {
 
 
 /* ==================================================
-   APPS SCRIPT URL
+   GOOGLE APPS SCRIPT URL
    ================================================== */
 
 const APPS_SCRIPT_URL =
 "https://script.google.com/macros/s/AKfycbyp9hUopC-ZLxGG2KiStLBQ8oDnNC-sKqOp1YdYZpkx4mPm2SpEXkckex5TI69uJIjXgg/exec";
 
+
+/* ==================================================
+   VARIABLES
+   ================================================== */
 
 let scanner = null;
 
@@ -378,10 +404,14 @@ let currentAction = "";
 
 
 /* ==================================================
-   MASTER SUB ACTIVITY TERBARU
+   MASTER SUB ACTIVITY
    ================================================== */
 
 const subActivities = {
+
+  /* ================================================
+     INBOUND
+     ================================================ */
 
   Inbound: [
 
@@ -401,6 +431,10 @@ const subActivities = {
 
   ],
 
+
+  /* ================================================
+     MOVEMENT
+     ================================================ */
 
   Movement: [
 
@@ -422,6 +456,10 @@ const subActivities = {
 
   ],
 
+
+  /* ================================================
+     OUTBOUND
+     ================================================ */
 
   Outbound: [
 
@@ -456,6 +494,10 @@ const subActivities = {
   ],
 
 
+  /* ================================================
+     AUGER
+     ================================================ */
+
   Auger: [
 
     "Moving Box",
@@ -470,6 +512,10 @@ const subActivities = {
 
   ],
 
+
+  /* ================================================
+     SLICING
+     ================================================ */
 
   Slicing: [
 
@@ -489,6 +535,10 @@ const subActivities = {
 
   ],
 
+
+  /* ================================================
+     REBOX
+     ================================================ */
 
   Rebox: [
 
@@ -516,39 +566,52 @@ function loadSubActivities() {
       .getElementById("departmentSelect")
       .value;
 
+
   const activitySelect =
     document
       .getElementById("activitySelect");
 
+
   activitySelect.innerHTML =
     '<option value="">Pilih Sub Activity</option>';
+
 
   if (!department) {
 
     updateDisplay();
 
     return;
+
   }
+
 
   const list =
     subActivities[department] || [];
+
 
   list.forEach(function(activity) {
 
     const option =
       document.createElement("option");
 
+
     option.value =
       activity;
+
 
     option.textContent =
       activity;
 
-    activitySelect.appendChild(option);
+
+    activitySelect.appendChild(
+      option
+    );
 
   });
 
+
   updateDisplay();
+
 }
 
 
@@ -562,6 +625,7 @@ document
     "change",
     updateDisplay
   );
+
 
 document
   .getElementById("actionSelect")
@@ -578,30 +642,36 @@ function updateDisplay() {
       .getElementById("departmentSelect")
       .value;
 
+
   const activity =
     document
       .getElementById("activitySelect")
       .value;
+
 
   const action =
     document
       .getElementById("actionSelect")
       .value;
 
+
   document
     .getElementById("activity")
     .innerText =
       department || "-";
+
 
   document
     .getElementById("subActivity")
     .innerText =
       activity || "-";
 
+
   document
     .getElementById("action")
     .innerText =
       action || "-";
+
 }
 
 
@@ -617,26 +687,34 @@ function startScanner() {
       .value
       .trim();
 
+
   const customerID =
     document
       .getElementById("customerID")
       .value;
+
 
   const department =
     document
       .getElementById("departmentSelect")
       .value;
 
+
   const activity =
     document
       .getElementById("activitySelect")
       .value;
+
 
   const action =
     document
       .getElementById("actionSelect")
       .value;
 
+
+  /* ================================================
+     VALIDATION
+     ================================================ */
 
   if (!operator) {
 
@@ -645,6 +723,7 @@ function startScanner() {
     );
 
     return;
+
   }
 
 
@@ -655,6 +734,7 @@ function startScanner() {
     );
 
     return;
+
   }
 
 
@@ -665,6 +745,7 @@ function startScanner() {
     );
 
     return;
+
   }
 
 
@@ -675,6 +756,7 @@ function startScanner() {
     );
 
     return;
+
   }
 
 
@@ -685,6 +767,7 @@ function startScanner() {
     );
 
     return;
+
   }
 
 
@@ -696,6 +779,7 @@ function startScanner() {
         .value
         .trim();
 
+
     if (quantity === "") {
 
       alert(
@@ -703,18 +787,26 @@ function startScanner() {
       );
 
       return;
+
     }
+
   }
 
 
-  if (scannerRunning) return;
+  if (scannerRunning) {
+
+    return;
+
+  }
 
 
   currentDepartment =
     department;
 
+
   currentActivity =
     activity;
+
 
   currentAction =
     action;
@@ -727,6 +819,7 @@ function startScanner() {
     .getElementById("status")
     .className =
       "status";
+
 
   document
     .getElementById("status")
@@ -741,7 +834,8 @@ function startScanner() {
   scanner.start(
 
     {
-      facingMode: "environment"
+      facingMode:
+        "environment"
     },
 
     {
@@ -751,11 +845,14 @@ function startScanner() {
         width: 250,
         height: 250
       }
+
     },
 
     function(decodedText) {
 
-      qrSuccess(decodedText);
+      qrSuccess(
+        decodedText
+      );
 
     },
 
@@ -763,46 +860,59 @@ function startScanner() {
 
   )
 
+
   .then(function() {
 
     scannerRunning =
       true;
+
 
     document
       .getElementById("scanButton")
       .style.display =
         "none";
 
+
     document
       .getElementById("stopButton")
       .style.display =
         "block";
 
+
     document
       .getElementById("status")
       .innerHTML =
+
       "📷 <b>Kamera aktif</b><br>" +
+
       "Scan QR " +
+
       currentDepartment;
 
   })
+
 
   .catch(function(error) {
 
     console.log(error);
 
+
     scannerRunning =
       false;
+
 
     document
       .getElementById("status")
       .className =
         "status warning";
 
+
     document
       .getElementById("status")
       .innerHTML =
+
       "❌ Kamera tidak dapat dibuka.<br>" +
+
       "Pastikan website menggunakan HTTPS.";
 
   });
@@ -816,7 +926,12 @@ function startScanner() {
 
 function qrSuccess(qrData) {
 
-  if (!scannerRunning) return;
+  if (!scannerRunning) {
+
+    return;
+
+  }
+
 
   scannerRunning =
     false;
@@ -824,7 +939,8 @@ function qrSuccess(qrData) {
 
   if (scanner) {
 
-    scanner.stop()
+    scanner
+      .stop()
 
       .then(function() {
 
@@ -832,7 +948,9 @@ function qrSuccess(qrData) {
 
         showScanButton();
 
-        processQR(qrData);
+        processQR(
+          qrData
+        );
 
       })
 
@@ -842,22 +960,29 @@ function qrSuccess(qrData) {
 
         showScanButton();
 
-        processQR(qrData);
+        processQR(
+          qrData
+        );
 
       });
 
-  } else {
+  }
+
+  else {
 
     showScanButton();
 
-    processQR(qrData);
+    processQR(
+      qrData
+    );
 
   }
+
 }
 
 
 /* ==================================================
-   VALIDASI QR
+   PROCESS QR
    ================================================== */
 
 function processQR(qrData) {
@@ -872,6 +997,7 @@ function processQR(qrData) {
     SLICING
     REBOX
   */
+
 
   const qrActivity =
     String(qrData)
@@ -890,6 +1016,7 @@ function processQR(qrData) {
     );
 
     return;
+
   }
 
 
@@ -898,15 +1025,18 @@ function processQR(qrData) {
     .className =
       "status";
 
+
   document
     .getElementById("status")
     .innerHTML =
-      "⏳ Memproses " +
-      currentAction +
-      "...";
+
+    "⏳ Memproses " +
+    currentAction +
+    "...";
 
 
   sendToGoogleSheet();
+
 }
 
 
@@ -921,10 +1051,13 @@ function showQRWarning(message) {
     .className =
       "status warning";
 
+
   document
     .getElementById("status")
     .innerHTML =
-      "⚠️ " + message;
+      "⚠️ " +
+      message;
+
 }
 
 
@@ -939,15 +1072,17 @@ function showScanButton() {
     .style.display =
       "block";
 
+
   document
     .getElementById("stopButton")
     .style.display =
       "none";
+
 }
 
 
 /* ==================================================
-   SEND TO GOOGLE SHEET
+   SEND DATA TO GOOGLE SHEET
    ================================================== */
 
 function sendToGoogleSheet() {
@@ -958,16 +1093,19 @@ function sendToGoogleSheet() {
       .value
       .trim();
 
+
   const customerID =
     document
       .getElementById("customerID")
       .value;
+
 
   const description =
     document
       .getElementById("description")
       .value
       .trim();
+
 
   const quantity =
     document
@@ -983,91 +1121,135 @@ function sendToGoogleSheet() {
   window[callbackName] =
     function(result) {
 
-      delete window[callbackName];
+
+      delete window[
+        callbackName
+      ];
 
 
       const script =
         document
-          .getElementById(callbackName);
+          .getElementById(
+            callbackName
+          );
 
 
       if (script) {
+
         script.remove();
+
       }
 
 
       /* ==========================================
-         START
+         START BERHASIL
          ========================================== */
 
       if (
+
         result.success &&
+
         result.type === "START"
+
       ) {
 
         document
-          .getElementById("transaction")
+          .getElementById(
+            "transaction"
+          )
           .innerText =
             result.transactionID;
 
 
         document
-          .getElementById("status")
+          .getElementById(
+            "status"
+          )
           .className =
             "status success";
 
 
         document
-          .getElementById("status")
+          .getElementById(
+            "status"
+          )
           .innerHTML =
+
           "🟢 <b>START BERHASIL</b><br>" +
+
           currentDepartment +
+
           " → " +
+
           currentActivity +
+
           "<br><br>" +
+
           "Status: Running";
 
+
         return;
+
       }
 
 
       /* ==========================================
-         END
+         FINISH BERHASIL
          ========================================== */
 
       if (
+
         result.success &&
+
         result.type === "FINISH"
+
       ) {
 
         document
-          .getElementById("transaction")
+          .getElementById(
+            "transaction"
+          )
           .innerText =
             result.transactionID;
 
 
         document
-          .getElementById("status")
+          .getElementById(
+            "status"
+          )
           .className =
             "status success";
 
 
         document
-          .getElementById("status")
+          .getElementById(
+            "status"
+          )
           .innerHTML =
+
           "✅ <b>SELESAI</b><br>" +
+
           currentDepartment +
+
           " → " +
+
           currentActivity +
+
           "<br>" +
+
           "Quantity: " +
+
           result.quantity +
+
           "<br>" +
+
           "Duration: " +
-          result.duration +
-          " menit";
+
+          result.duration;
+
 
         return;
+
       }
 
 
@@ -1076,23 +1258,33 @@ function sendToGoogleSheet() {
          ========================================== */
 
       if (
+
         result.type ===
         "ALREADY_RUNNING"
+
       ) {
 
         document
-          .getElementById("status")
+          .getElementById(
+            "status"
+          )
           .className =
             "status warning";
 
 
         document
-          .getElementById("status")
+          .getElementById(
+            "status"
+          )
           .innerHTML =
+
           "⚠️ <b>Masih Running</b><br>" +
+
           "Silakan lakukan END terlebih dahulu.";
 
+
         return;
+
       }
 
 
@@ -1101,22 +1293,31 @@ function sendToGoogleSheet() {
          ========================================== */
 
       if (
+
         result.type ===
         "NEED_QUANTITY"
+
       ) {
 
         document
-          .getElementById("status")
+          .getElementById(
+            "status"
+          )
           .className =
             "status warning";
 
 
         document
-          .getElementById("status")
+          .getElementById(
+            "status"
+          )
           .innerHTML =
+
           "⚠️ Isi Quantity terlebih dahulu.";
 
+
         return;
+
       }
 
 
@@ -1125,22 +1326,31 @@ function sendToGoogleSheet() {
          ========================================== */
 
       if (
+
         result.type ===
         "INVALID_QUANTITY"
+
       ) {
 
         document
-          .getElementById("status")
+          .getElementById(
+            "status"
+          )
           .className =
             "status warning";
 
 
         document
-          .getElementById("status")
+          .getElementById(
+            "status"
+          )
           .innerHTML =
+
           "⚠️ Quantity harus berupa angka.";
 
+
         return;
+
       }
 
 
@@ -1149,22 +1359,31 @@ function sendToGoogleSheet() {
          ========================================== */
 
       if (
+
         result.type ===
         "NO_RUNNING"
+
       ) {
 
         document
-          .getElementById("status")
+          .getElementById(
+            "status"
+          )
           .className =
             "status warning";
 
 
         document
-          .getElementById("status")
+          .getElementById(
+            "status"
+          )
           .innerHTML =
+
           "⚠️ Tidak ditemukan data Running untuk proses ini.";
 
+
         return;
+
       }
 
 
@@ -1173,15 +1392,21 @@ function sendToGoogleSheet() {
          ========================================== */
 
       document
-        .getElementById("status")
+        .getElementById(
+          "status"
+        )
         .className =
           "status warning";
 
 
       document
-        .getElementById("status")
+        .getElementById(
+          "status"
+        )
         .innerHTML =
+
         "❌ " +
+
         (
           result.message ||
           "Data gagal diproses."
@@ -1191,7 +1416,7 @@ function sendToGoogleSheet() {
 
 
   /* ==========================================
-     SEND PARAMETERS
+     PARAMETER
      ========================================== */
 
   const params =
@@ -1228,7 +1453,9 @@ function sendToGoogleSheet() {
 
 
   const script =
-    document.createElement("script");
+    document.createElement(
+      "script"
+    );
 
 
   script.id =
@@ -1243,7 +1470,10 @@ function sendToGoogleSheet() {
 
   document
     .body
-    .appendChild(script);
+    .appendChild(
+      script
+    );
+
 }
 
 
